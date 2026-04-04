@@ -9,9 +9,9 @@ const MissionItem = ({ mission, onToggle }: MissionItemProps) => {
   return (
     <div
       className={[
-        'flex items-center gap-3 bg-white/[0.04] border border-white/[0.08]',
+        'flex items-center gap-3 bg-white border border-slate-100 shadow-sm',
         'rounded-2xl px-4 py-4 transition-opacity duration-200',
-        mission.done ? 'opacity-60' : 'opacity-100',
+        mission.done ? 'opacity-60 bg-slate-50' : 'opacity-100',
       ].join(' ')}
     >
       {/* 체크 버튼 */}
@@ -24,7 +24,7 @@ const MissionItem = ({ mission, onToggle }: MissionItemProps) => {
           'transition-all duration-200',
           mission.done
             ? 'bg-brand-green border-brand-green text-white cursor-default'
-            : 'bg-transparent border-white/25 text-white/0 cursor-pointer',
+            : 'bg-transparent border-slate-200 text-transparent cursor-pointer hover:bg-slate-50',
         ].join(' ')}
       >
         {mission.done ? '✓' : ''}
@@ -37,17 +37,17 @@ const MissionItem = ({ mission, onToggle }: MissionItemProps) => {
       <div className="flex-1 min-w-0">
         <p className={[
           'text-[14px] font-semibold mb-0.5 truncate',
-          mission.done ? 'line-through text-white/50' : 'text-white'
+          mission.done ? 'line-through text-slate-400' : 'text-slate-800'
         ].join(' ')}>
           {mission.title}
         </p>
-        <span className="text-[11px] text-white/40">{mission.category}</span>
+        <span className="text-[11px] text-slate-500">{mission.category}</span>
       </div>
 
       {/* 포인트 */}
       <div className="flex flex-col items-end flex-shrink-0">
-        <span className="text-base font-extrabold text-brand-green">+{mission.point}</span>
-        <span className="text-[11px] text-white/40">안정도</span>
+        <span className="text-base font-extrabold text-brand-green-dark">+{mission.point}</span>
+        <span className="text-[11px] text-slate-400 font-medium">안정도</span>
       </div>
     </div>
   );

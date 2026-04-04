@@ -36,10 +36,13 @@ const SignupPage = () => {
       // Status code check since some APIs don't return standard JSON on errors
       if (!response.ok) {
         let msg = '회원가입에 실패했습니다.';
+        if (response.status === 500) {
+          msg = '서버 오류입니다 (이미 가입된 이메일이거나 서버 내부 문제일 수 있습니다.)';
+        }
         try {
           const result = await response.json();
           msg = result.message || msg;
-        } catch { }
+        } catch { } // If JSON parse fails, fallback to default msg
         setErrorMsg(msg);
         setIsLoading(false);
         return;
@@ -64,8 +67,8 @@ const SignupPage = () => {
 
   return (
     <AuthLayout>
-      <div className="bg-white/[0.05] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-xl">
-        <h2 className="text-xl font-bold text-white mb-6 text-center">회원가입</h2>
+      <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+        <h2 className="text-xl font-extrabold text-slate-800 mb-6 text-center">회원가입</h2>
 
         <div className="flex flex-col gap-4 mb-2">
           <Input
@@ -109,9 +112,9 @@ const SignupPage = () => {
           </Button>
         </div>
 
-        <p className="text-center text-white/45 text-[13px] mt-7">
+        <p className="text-center text-slate-500 text-[13px] mt-7">
           이미 계정이 있으신가요?{' '}
-          <button id="login-link" onClick={() => navigate('/login')} className="text-brand-purple hover:text-brand-purple-light transition-colors text-[13px] font-semibold underline cursor-pointer bg-transparent border-none">
+          <button id="login-link" onClick={() => navigate('/login')} className="text-brand-orange-dark hover:text-brand-orange transition-colors text-[13px] font-bold underline cursor-pointer bg-transparent border-none">
             로그인하기
           </button>
         </p>

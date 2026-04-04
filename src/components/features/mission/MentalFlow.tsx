@@ -25,11 +25,11 @@ const MentalFlow: FC<MentalFlowProps> = ({ data }) => {
   };
 
   return (
-    <div className="bg-white/[0.04] border border-white/[0.08] rounded-[20px] p-5">
+    <div className="bg-[#B6754C] shadow-md rounded-[20px] p-5">
       <div className="mb-4">
-        <h3 className="text-[13px] font-medium text-white/50 mb-1">이번 주 스트레스 흐름</h3>
+        <h3 className="text-[13px] font-medium text-white/80 mb-1">이번 주 스트레스 흐름</h3>
         <h2 className="text-[19px] font-bold text-white">
-          <span className="text-brand-orange drop-shadow-md">{hardestDayItem.day}요일</span>이 가장 힘들었어요
+          <span className="text-[#FFCB9A] drop-shadow-sm">{hardestDayItem.day}요일</span>이 가장 힘들었어요
         </h2>
       </div>
 
@@ -42,9 +42,9 @@ const MentalFlow: FC<MentalFlowProps> = ({ data }) => {
           return (
             <div key={index} className="flex flex-col items-center gap-2 flex-1 group cursor-pointer">
               {/* 막대 컨테이너 */}
-              <div className="relative w-full flex justify-center items-end h-[100px] transition hover:bg-white/[0.03] rounded-md">
+              <div className="relative w-full flex justify-center items-end h-[100px] transition hover:bg-white/10 rounded-md">
                 {/* 호버 시 나타나는 수치 툴팁 */}
-                <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-surface-secondary text-[10px] font-bold rounded-md px-2 py-1 shadow-lg pointer-events-none border border-white/10 z-10 text-white">
+                <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-[10px] font-bold rounded-md px-2 py-1 shadow-md pointer-events-none z-10 text-[#B6754C]">
                   {item.level}
                 </div>
 
@@ -56,7 +56,7 @@ const MentalFlow: FC<MentalFlowProps> = ({ data }) => {
               </div>
 
               {/* 요일 라벨 */}
-              <span className={`text-[11px] ${isToday ? 'text-white font-bold' : 'text-white/40'}`}>
+              <span className={`text-[11px] ${isToday ? 'text-white font-bold' : 'text-white/60 font-medium'}`}>
                 {item.day}
               </span>
             </div>

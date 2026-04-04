@@ -8,18 +8,18 @@ const Input = ({ label, id, className = '', ...props }: InputProps) => {
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
-        <label htmlFor={id} className="text-[13px] font-medium text-white/70">
+        <label htmlFor={id} className="text-[13px] font-bold text-slate-600">
           {label}
         </label>
       )}
       <input
         id={id}
         className={[
-          'bg-white/[0.07] border border-white/[0.12] rounded-xl px-4 py-[14px]',
-          'text-white text-[15px] outline-none font-sans',
-          'placeholder:text-white/30',
+          'bg-white border border-slate-200 rounded-xl px-4 py-[14px]',
+          'text-slate-800 text-[15px] outline-none font-sans shadow-sm',
+          'placeholder:text-slate-400',
           'transition-all duration-200',
-          'focus:border-brand-purple/60 focus:bg-white/10',
+          'focus:border-brand-orange/60 focus:ring-2 focus:ring-brand-orange/20',
           className,
         ].join(' ')}
         {...props}

@@ -10,10 +10,10 @@ const BottomNav = () => {
       <div
         className={[
           'flex items-center',
-          'bg-[rgba(20,20,35,0.92)] backdrop-blur-2xl',
-          'border border-white/10 rounded-3xl',
+          'bg-white/90 backdrop-blur-2xl',
+          'border border-slate-200/50 rounded-3xl',
           'py-2 px-1',
-          'shadow-[0_-4px_30px_rgba(0,0,0,0.4),0_4px_20px_rgba(0,0,0,0.3)]',
+          'shadow-[0_-4px_30px_rgba(0,0,0,0.05),0_4px_20px_rgba(0,0,0,0.03)]',
         ].join(' ')}
       >
         {NAV_ITEMS.map((item) => {
@@ -27,13 +27,13 @@ const BottomNav = () => {
                 'flex-1 flex flex-col items-center gap-[3px] py-2 px-1',
                 'relative rounded-[18px] transition-all duration-200 cursor-pointer',
                 'border-none bg-transparent',
-                isActive ? 'bg-brand-purple/15' : 'hover:bg-white/5',
+                isActive ? 'bg-brand-orange/15' : 'hover:bg-slate-100/50',
               ].join(' ')}
             >
               <span
                 className={[
                   'text-[22px] leading-none block transition-transform duration-200',
-                  isActive ? '-translate-y-0.5' : '',
+                  isActive ? '-translate-y-0.5' : 'opacity-60',
                 ].join(' ')}
               >
                 {item.icon}
@@ -41,13 +41,13 @@ const BottomNav = () => {
               <span
                 className={[
                   'text-[10px] font-medium leading-none transition-colors duration-200',
-                  isActive ? 'text-brand-purple font-bold' : 'text-white/40',
+                  isActive ? 'text-brand-orange-dark font-bold' : 'text-slate-400',
                 ].join(' ')}
               >
                 {item.label}
               </span>
               {isActive && (
-                <span className="absolute bottom-[5px] w-1 h-1 rounded-full bg-brand-purple animate-dot-appear" />
+                <span className="absolute bottom-[5px] w-1 h-1 rounded-full bg-brand-orange-dark animate-dot-appear" />
               )}
             </button>
           );

@@ -17,10 +17,10 @@ const WeekStress = ({ data }: WeekStressProps) => {
   };
 
   return (
-    <div className="bg-white/[0.04] border border-white/[0.08] rounded-[20px] p-4">
+    <div className="bg-[#B6754C] shadow-md rounded-[20px] p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-white/90">주간 스트레스 수치</h3>
-        <span className="text-xs text-brand-orange">최근 7일</span>
+        <h3 className="text-sm font-semibold text-white">주간 스트레스 수치</h3>
+        <span className="text-xs text-white/80 font-medium">최근 7일</span>
       </div>
 
       <div className="flex items-end justify-between h-[120px] gap-1 mt-2 px-1">
@@ -32,9 +32,9 @@ const WeekStress = ({ data }: WeekStressProps) => {
           return (
             <div key={index} className="flex flex-col items-center gap-2 flex-1 group cursor-pointer">
               {/* 막대 컨테이너 */}
-              <div className="relative w-full flex justify-center items-end h-[100px] transition hover:bg-white/[0.03] rounded-md">
+              <div className="relative w-full flex justify-center items-end h-[100px] transition hover:bg-white/10 rounded-md">
                 {/* 호버 시 나타나는 수치 툴팁 */}
-                <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-surface-secondary text-[10px] font-bold rounded-md px-2 py-1 shadow-lg pointer-events-none border border-white/10 z-10 text-white">
+                <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-[10px] font-bold rounded-md px-2 py-1 shadow-md pointer-events-none z-10 text-[#B6754C]">
                   {item.level}
                 </div>
 
@@ -46,7 +46,7 @@ const WeekStress = ({ data }: WeekStressProps) => {
               </div>
 
               {/* 요일 라벨 */}
-              <span className={`text-[11px] ${isToday ? 'text-white font-bold' : 'text-white/40'}`}>
+              <span className={`text-[11px] ${isToday ? 'text-white font-bold' : 'text-white/60 font-medium'}`}>
                 {item.day}
               </span>
             </div>

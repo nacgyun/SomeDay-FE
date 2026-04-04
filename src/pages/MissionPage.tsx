@@ -48,7 +48,7 @@ const MissionPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-20 text-white relative">
+    <div className="min-h-screen bg-[#F0ECE4] pb-20 text-slate-800 relative">
       <PageHeader
         title="미션 & 회복 가이드"
         gradientColor="green"
@@ -70,11 +70,11 @@ const MissionPage = () => {
 
       {/* 미션 완료 확인 팝업 */}
       {pendingMission && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-5">
-          <div className="bg-surface-secondary border border-white/10 rounded-2xl w-full max-w-[320px] p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-2 text-center">미션 완료</h3>
-            <p className="text-[15px] text-white/70 mb-6 text-center leading-relaxed">
-              <span className="text-brand-green font-bold">'{pendingMission.title}'</span>을(를)<br />완료 하셨나요?
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px] px-5">
+          <div className="bg-white border border-slate-100 rounded-2xl w-full max-w-[320px] p-6 shadow-2xl">
+            <h3 className="text-lg font-bold text-slate-800 mb-2 text-center">미션 완료</h3>
+            <p className="text-[15px] text-slate-600 mb-6 text-center leading-relaxed font-medium">
+              <span className="text-brand-green-dark font-bold">'{pendingMission.title}'</span>을(를)<br />완료 하셨나요?
             </p>
             <div className="flex gap-3">
               <Button variant="ghost" fullWidth onClick={() => setPendingMission(null)}>

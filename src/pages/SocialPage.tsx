@@ -74,10 +74,10 @@ const SocialPage = () => {
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return;
     const { scrollTop, clientHeight } = containerRef.current;
-    
+
     // 현재 화면에 가장 많이 보이는 슬라이드 인덱스 계산
     const index = Math.round(scrollTop / clientHeight);
-    
+
     if (index !== activeIndex && index >= 0 && index < users.length) {
       setActiveIndex(index);
     }
@@ -91,7 +91,7 @@ const SocialPage = () => {
           // 새 블록을 꼭대기 층에 예쁘게 추가 (임시 로직)
           const highestFloor = u.tower.total_floors;
           const randomPos = Math.floor(Math.random() * 3); // 0, 1, 2 중 하나
-          
+
           return {
             ...u,
             tower: {
@@ -116,10 +116,10 @@ const SocialPage = () => {
   };
 
   return (
-    <div 
+    <div
       ref={containerRef}
       onScroll={handleScroll}
-      className="w-full h-screen overflow-y-scroll snap-y snap-mandatory bg-[#121212] relative pb-[60px]" // pb-[60px] removes bottomNav overlap on scroll end
+      className="w-full h-screen overflow-y-scroll snap-y snap-mandatory bg-[#F0ECE4] relative pb-[60px]" // pb-[60px] removes bottomNav overlap on scroll end
     >
       {users.map((user, index) => {
         const isActive = index === activeIndex;
@@ -128,19 +128,19 @@ const SocialPage = () => {
         const isRendered = Math.abs(index - activeIndex) <= 1;
 
         return (
-          <SocialFeedItem 
-            key={user.id} 
-            user={user} 
-            isActive={isActive} 
-            isRendered={isRendered} 
-            onComfort={handleComfort} 
+          <SocialFeedItem
+            key={user.id}
+            user={user}
+            isActive={isActive}
+            isRendered={isRendered}
+            onComfort={handleComfort}
           />
         );
       })}
 
       {/* 헤더 오버레이 - 스크롤 상관없이 화면 상단 고정 */}
-      <div className="fixed top-0 left-0 right-0 z-50 p-5 pt-12 bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
-        <h1 className="text-xl font-bold text-white drop-shadow-md">소셜 (둘러보기)</h1>
+      <div className="fixed top-0 left-0 right-0 z-50 p-5 pt-12 bg-gradient-to-b from-white/60 to-transparent pointer-events-none">
+        <h1 className="text-xl font-bold text-slate-800 drop-shadow-sm">소셜 (둘러보기)</h1>
       </div>
     </div>
   );

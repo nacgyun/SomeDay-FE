@@ -75,34 +75,34 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
     <div className="fixed inset-0 z-[100] flex items-end justify-center">
       {/* 딤 오버레이 */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
         onClick={onClose}
       />
 
       {/* 모달 패널 */}
-      <div className="relative w-full max-w-[480px] h-[88vh] flex flex-col bg-[#0f0f1e] border border-white/10 rounded-t-[28px] shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-[480px] h-[88vh] flex flex-col bg-white border border-slate-200 rounded-t-[28px] shadow-2xl overflow-hidden">
         {/* 핸들 */}
         <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
+          <div className="w-10 h-1 rounded-full bg-slate-300" />
         </div>
 
         {/* 헤더 */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.08] flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 flex-shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-purple to-brand-blue flex items-center justify-center text-base">
+            <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-base border border-slate-200 shadow-sm">
               {mode === 'diary' ? '📔' : '📋'}
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-white leading-tight">
+              <h3 className="text-[15px] font-bold text-slate-800 leading-tight">
                 {mode === 'diary' ? '오늘 일기 쓰기' : '마음 설문'}
               </h3>
-              <p className="text-[11px] text-brand-purple">AI 감정 코치와 대화 중</p>
+              <p className="text-[11px] text-brand-orange-dark font-medium">AI 감정 코치와 대화 중</p>
             </div>
           </div>
           <button
             id="diary-modal-close-btn"
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.08] text-white/60 hover:bg-white/15 transition-colors text-lg cursor-pointer border-none"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors text-lg cursor-pointer border-none"
           >
             ×
           </button>
@@ -117,17 +117,17 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
             >
               {/* AI 아바타 */}
               {msg.role === 'ai' && (
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-brand-purple/60 to-brand-blue/60 flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5">
+                <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5">
                   🤖
                 </div>
               )}
 
               <div
                 className={[
-                  'max-w-[78%] rounded-[16px] px-4 py-3 text-[14px] leading-relaxed whitespace-pre-line',
+                  'max-w-[78%] rounded-[16px] px-4 py-3 text-[14px] leading-relaxed whitespace-pre-line shadow-sm border border-transparent',
                   msg.role === 'ai'
-                    ? 'bg-white/[0.08] border border-white/10 text-white/90 rounded-tl-sm'
-                    : 'bg-gradient-to-br from-brand-purple to-brand-blue text-white rounded-tr-sm',
+                    ? 'bg-slate-50 border-slate-200 text-slate-800 rounded-tl-sm'
+                    : 'bg-gradient-to-br from-brand-orange to-brand-orange-dark text-white rounded-tr-sm shadow-[0_4px_12px_rgba(255,107,0,0.2)]',
                 ].join(' ')}
               >
                 {msg.text}
@@ -138,14 +138,14 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
           {/* AI 타이핑 인디케이터 */}
           {isTyping && (
             <div className="flex justify-start">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-brand-purple/60 to-brand-blue/60 flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5">
+              <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5">
                 🤖
               </div>
-              <div className="bg-white/[0.08] border border-white/10 rounded-[16px] rounded-tl-sm px-4 py-3.5 flex items-center gap-1">
+              <div className="bg-slate-50 border border-slate-200 rounded-[16px] rounded-tl-sm px-4 py-3.5 flex items-center gap-1 shadow-sm">
                 {[0, 1, 2].map((i) => (
                   <span
                     key={i}
-                    className="w-1.5 h-1.5 rounded-full bg-white/50 animate-bounce"
+                    className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"
                     style={{ animationDelay: `${i * 0.15}s` }}
                   />
                 ))}
@@ -156,8 +156,8 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
         </div>
 
         {/* 입력 창 */}
-        <div className="px-4 pb-6 pt-3 border-t border-white/[0.08] flex-shrink-0">
-          <div className="flex items-center gap-2.5 bg-white/[0.07] border border-white/12 rounded-2xl px-4 py-2.5">
+        <div className="px-4 pb-6 pt-3 border-t border-slate-100 flex-shrink-0">
+          <div className="flex items-center gap-2.5 bg-white border border-slate-200 shadow-inner rounded-2xl px-4 py-2.5">
             <input
               ref={inputRef}
               id="diary-chat-input"
@@ -166,7 +166,7 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
               placeholder="마음을 자유롭게 적어보세요..."
-              className="flex-1 bg-transparent text-white text-[14px] outline-none placeholder:text-white/30 font-sans"
+              className="flex-1 bg-transparent text-slate-800 text-[14px] outline-none placeholder:text-slate-400 font-sans"
             />
             <button
               id="diary-send-btn"
@@ -175,8 +175,8 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
               className={[
                 'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 cursor-pointer border-none text-base',
                 input.trim() && !isTyping
-                  ? 'bg-gradient-to-br from-brand-purple to-brand-blue text-white shadow-[0_2px_12px_rgba(167,139,250,0.4)]'
-                  : 'bg-white/10 text-white/30',
+                  ? 'bg-gradient-to-br from-brand-orange to-brand-orange-dark text-white shadow-[0_4px_12px_rgba(255,107,0,0.3)]'
+                  : 'bg-slate-100 text-slate-400',
               ].join(' ')}
             >
               ↑

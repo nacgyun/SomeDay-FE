@@ -63,3 +63,14 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+
+export interface UserProfile {
+  id: number;
+  userId: number;
+  avatarEmoji: string;
+  consecutiveDays: number;
+  totalLayers: number;
+  cheersSent: number;
+  cheersReceived: number;
+  createdAt: string;
+}

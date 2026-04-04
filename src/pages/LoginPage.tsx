@@ -36,7 +36,20 @@ const LoginPage = () => {
       const result: ApiResponse<User> = await response.json();
 
       if (result.status === 'SUCCESS') {
-        login(result.data);
+        const userData = result.data;
+        let profileData = null;
+
+        try {
+          const profileResponse = await fetch(`https://someday-be-production.up.railway.app/api/my-profiles/${userData.id}`);
+          if (profileResponse.ok) {
+            const profileDataActual = await profileResponse.json();
+            profileData = profileDataActual;
+          }
+        } catch (profileError) {
+          console.error('Failed to fetch profile data:', profileError);
+        }
+
+        login(userData, profileData);
         navigate('/main');
       } else {
         setErrorMsg(result.message || '이메일 또는 비밀번호를 확인해주세요.');
@@ -51,21 +64,21 @@ const LoginPage = () => {
 
   return (
     <AuthLayout>
-      <div className="bg-white/[0.05] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-xl">
+      <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
         <div className="flex flex-col gap-4 mb-2">
-          <Input 
-            id="email"    
-            type="email"    
-            label="이메일"   
-            placeholder="이메일을 입력하세요" 
+          <Input
+            id="email"
+            type="email"
+            label="이메일"
+            placeholder="이메일을 입력하세요"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Input 
-            id="password" 
-            type="password" 
-            label="비밀번호" 
-            placeholder="비밀번호를 입력하세요" 
+          <Input
+            id="password"
+            type="password"
+            label="비밀번호"
+            placeholder="비밀번호를 입력하세요"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
@@ -77,24 +90,24 @@ const LoginPage = () => {
         </div>
 
         {/* 구분선 */}
-        <div className="flex items-center gap-3 text-white/30 text-[13px] my-5 relative">
-          <div className="flex-1 h-px bg-white/10" />
+        <div className="flex items-center gap-3 text-slate-400 text-[13px] my-5 relative">
+          <div className="flex-1 h-px bg-slate-200" />
           <span className="font-medium">또는</span>
-          <div className="flex-1 h-px bg-white/10" />
+          <div className="flex-1 h-px bg-slate-200" />
         </div>
 
         <div className="flex flex-col gap-3">
-          <Button id="kakao-login-btn" variant="kakao" fullWidth className="py-3">
+          <Button id="kakao-login-btn" variant="kakao" fullWidth className="py-3 shadow-sm hover:shadow-md transition-shadow">
             <span className="mr-1">💬</span> 카카오로 시작하기
           </Button>
-          <Button id="google-login-btn" variant="google" fullWidth className="py-3">
+          <Button id="google-login-btn" variant="google" fullWidth className="py-3 shadow-sm hover:shadow-md transition-shadow">
             <span className="mr-1">🔍</span> Google로 시작하기
           </Button>
         </div>
 
-        <p className="text-center text-white/45 text-[13px] mt-7">
+        <p className="text-center text-slate-500 text-[13px] mt-7">
           아직 계정이 없으신가요?{' '}
-          <button id="signup-link" onClick={() => navigate('/signup')} className="text-brand-purple hover:text-brand-purple-light transition-colors text-[13px] font-semibold underline cursor-pointer bg-transparent border-none">
+          <button id="signup-link" onClick={() => navigate('/signup')} className="text-brand-orange-dark hover:text-brand-orange transition-colors text-[13px] font-bold underline cursor-pointer bg-transparent border-none">
             회원가입
           </button>
         </p>

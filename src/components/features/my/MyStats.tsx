@@ -9,15 +9,15 @@ interface StatItemProps {
 }
 
 const StatItem: FC<StatItemProps> = ({ title, value, unit, icon, colorClass }) => (
-  <div className="bg-white/[0.04] border border-white/[0.08] rounded-[20px] p-4 flex flex-col items-center justify-center gap-1.5 transition-colors hover:bg-white/[0.06]">
-    <div className={`text-2xl mb-1 ${colorClass} opacity-90 drop-shadow-md`}>
+  <div className="bg-white border border-slate-100 shadow-sm rounded-[20px] p-4 flex flex-col items-center justify-center gap-1.5 transition-colors hover:bg-slate-50">
+    <div className={`text-2xl mb-1 ${colorClass} opacity-90 drop-shadow-sm`}>
       {icon}
     </div>
     <div className="flex items-baseline gap-0.5">
-      <span className="text-xl font-bold text-white">{value}</span>
-      <span className="text-xs text-white/60">{unit}</span>
+      <span className="text-xl font-bold text-slate-800">{value}</span>
+      <span className="text-xs text-slate-500">{unit}</span>
     </div>
-    <span className="text-[11px] text-white/40">{title}</span>
+    <span className="text-[11px] text-slate-400 font-medium">{title}</span>
   </div>
 );
 

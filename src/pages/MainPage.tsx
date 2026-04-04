@@ -51,15 +51,15 @@ const MainPage = () => {
   const isStable = TOWER.stability_score >= 60;
   const userName = user?.nickname || user?.name || '사용자';
 
-  // 안정도에 따른 배경색 클래스 (Framer 3D 타워 레이아웃용)
+  // 안정도에 따른 배경색 클래스
   const bgGradient = isStable
-    ? 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#95d5b2]/40 via-[#d8f3dc]/10 to-[#121212]' // 밝은 민트 -> 다크 테마 배경에 맞춰 변경 (목업 참조)
-    : 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#6c757d]/40 via-[#495057]/20 to-[#121212]'; // 차콜 그레이
+    ? 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/60 via-transparent to-transparent'
+    : 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent';
 
   return (
     <>
-      <div className={`relative w-full h-screen overflow-hidden transition-colors duration-1000 bg-[#1e1e24] ${bgGradient}`}>
-        
+      <div className={`relative w-full h-screen overflow-hidden transition-colors duration-1000 bg-[#F0ECE4] ${bgGradient}`}>
+
         {/* 3D 젠가 타워 배경 (Absolute로 전체 화면 점유) */}
         <JengaTower3D tower={TOWER} blocks={BLOCKS} />
 
@@ -67,24 +67,24 @@ const MainPage = () => {
         <div className="absolute top-0 left-0 right-0 z-10 p-5 pt-12 flex flex-col pointer-events-none">
           {/* 상단 D-10 & 알림 아이콘 UI */}
           <div className="flex justify-between items-start mb-2">
-            <h1 className={`text-4xl font-extrabold tracking-tighter ${isStable ? 'text-brand-green-dark' : 'text-white/90'}`}>
+            <h1 className={`text-4xl font-extrabold tracking-tighter ${isStable ? 'text-brand-orange-dark' : 'text-slate-800'}`}>
               D-10
             </h1>
-            <button className="pointer-events-auto bg-transparent border-none">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isStable ? '#2d6a4f' : '#ffffff'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <button className="pointer-events-auto bg-transparent border-none cursor-pointer">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isStable ? '#f97316' : '#334155'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
             </button>
           </div>
-          
-          <h2 className={`text-[21px] font-bold leading-tight mb-4 ${isStable ? 'text-brand-green-dark/80' : 'text-white/80'}`}>
+
+          <h2 className={`text-[21px] font-bold leading-tight mb-4 ${isStable ? 'text-brand-orange-dark/80' : 'text-slate-700'}`}>
             {isStable ? '생글생글 웃고있는' : '휴... 기운없는'}<br />
             {userName}님의 타워
           </h2>
 
           <div className="flex gap-2">
-            <button className={`pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full ${isStable ? 'bg-white shadow-sm text-brand-green-dark' : 'bg-white/20 text-white backdrop-blur-md'} font-bold text-sm border-none`}>
+            <button className={`pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full ${isStable ? 'bg-white shadow-sm text-brand-orange-dark border border-brand-orange/20' : 'bg-slate-200 text-slate-700 backdrop-blur-md'} font-bold text-sm border-none cursor-pointer`}>
               📦 블록 쌓기
             </button>
           </div>
@@ -92,21 +92,21 @@ const MainPage = () => {
 
         {/* 측면 스트레스/안정도 인디케이터 (목업 참조) */}
         <div className="absolute left-5 top-[55%] -translate-y-1/2 z-10 pointer-events-none flex flex-col items-center">
-             <div className="w-2.5 h-32 rounded-full overflow-hidden bg-white/20">
-                {/* Score 만큼 바의 높이를 채움. (예: 55%면 높이가 55%이며 아래에서부터 차오름) */}
-                <div 
-                  className={`w-full rounded-full transition-all duration-1000 ${isStable ? 'bg-[#95d5b2]' : 'bg-[#64b5f6]'}`} 
-                  style={{ height: `${TOWER.stability_score}%`, marginTop: `${100 - TOWER.stability_score}%` }} 
-                />
-             </div>
-             <div className="mt-2 text-center">
-               <p className="text-[12px] font-extrabold text-white/90">
-                 {TOWER.stability_score}%
-               </p>
-               <p className="text-[10px] font-bold text-white/60">
-                 안정도
-               </p>
-             </div>
+          <div className="w-2.5 h-32 rounded-full overflow-hidden bg-slate-300/50 shadow-inner">
+            {/* Score 만큼 바의 높이를 채움. (예: 55%면 높이가 55%이며 아래에서부터 차오름) */}
+            <div
+              className={`w-full rounded-full transition-all duration-1000 ${isStable ? 'bg-brand-orange shadow-sm' : 'bg-slate-400'}`}
+              style={{ height: `${TOWER.stability_score}%`, marginTop: `${100 - TOWER.stability_score}%` }}
+            />
+          </div>
+          <div className="mt-2 text-center">
+            <p className="text-[12px] font-extrabold text-slate-800">
+              {TOWER.stability_score}%
+            </p>
+            <p className="text-[10px] font-bold text-slate-500">
+              안정도
+            </p>
+          </div>
         </div>
 
         {/* 하단 CTA (일기/설문 작성) - BottomNav 위쪽 */}

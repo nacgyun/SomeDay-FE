@@ -25,11 +25,10 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
   const [message, setMessage] = useState('');
   const [particles, setParticles] = useState<{ id: number; x: number }[]>([]);
 
-  // 소셜 피드용 어두운 푸른밤 배경 또는 유저 상태에 따른 배경 (메인과 다르게 그라데이션)
   const isStable = user.tower.stability_score >= 60;
   const bgGradient = isStable
-    ? 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#2a3b4c] via-[#1a232c] to-[#0d1217]' // 밤하늘 느낌의 파란 그레이
-    : 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#3a2c3a] via-[#241a24] to-[#120d12]'; // 보랏빛/붉은기 있는 어두운 밤
+    ? 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/60 via-transparent to-transparent'
+    : 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +60,7 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
       ) : (
         <div className="absolute inset-0 flex items-center justify-center">
           {/* 렌더링되지 않을 때의 플레이스홀더 */}
-          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin opacity-20"></div>
+          <div className="w-10 h-10 border-4 border-slate-300 border-t-transparent rounded-full animate-spin opacity-40"></div>
         </div>
       )}
 
@@ -70,23 +69,23 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
         <div className="flex items-center gap-2 mb-2">
           <span className="text-3xl">{user.avatar}</span>
           <div>
-            <h2 className="text-xl font-bold text-white leading-tight">{user.name}님의 타워</h2>
-            <p className="text-sm text-white/75">{user.statusMessage}</p>
+            <h2 className="text-xl font-bold text-slate-800 leading-tight">{user.name}님의 타워</h2>
+            <p className="text-sm text-slate-600">{user.statusMessage}</p>
           </div>
         </div>
       </div>
 
       {/* 안정도 인디케이터 */}
       <div className="absolute left-5 top-[55%] -translate-y-1/2 z-10 pointer-events-none flex flex-col items-center">
-        <div className="w-2.5 h-32 rounded-full overflow-hidden bg-white/10">
+        <div className="w-2.5 h-32 rounded-full overflow-hidden bg-slate-300/50 shadow-inner">
           <div
-            className={`w-full rounded-full transition-all duration-1000 ${isStable ? 'bg-[#90e0ef]' : 'bg-[#f4a261]'}`}
+            className={`w-full rounded-full transition-all duration-1000 ${isStable ? 'bg-brand-orange shadow-sm' : 'bg-slate-400'}`}
             style={{ height: `${user.tower.stability_score}%`, marginTop: `${100 - user.tower.stability_score}%` }}
           />
         </div>
         <div className="mt-2 text-center">
-          <p className="text-[12px] font-extrabold text-white/90">{user.tower.stability_score}%</p>
-          <p className="text-[10px] font-bold text-white/50">안정도</p>
+          <p className="text-[12px] font-extrabold text-slate-800">{user.tower.stability_score}%</p>
+          <p className="text-[10px] font-bold text-slate-500">안정도</p>
         </div>
       </div>
 
@@ -99,7 +98,7 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
           <div className="w-14 h-14 bg-gradient-to-tr from-[#ffb5a7] to-[#fcd5ce] rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(255,181,167,0.4)] transition-transform group-hover:scale-110 group-active:scale-95">
             <span className="text-2xl">💖</span>
           </div>
-          <span className="text-[11px] font-bold text-white/80 drop-shadow-md">토닥토닥</span>
+          <span className="text-[11px] font-bold text-slate-700 drop-shadow-sm">토닥토닥</span>
         </button>
       </div>
 
@@ -122,7 +121,7 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 z-50 flex items-end justify-center bg-black/30 backdrop-blur-[2px]"
             onClick={() => setShowComfortModal(false)}
           >
             <motion.div
@@ -130,10 +129,10 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="w-full max-w-[500px] bg-[#1e1e24] rounded-t-[32px] p-6 pb-12 shadow-2xl"
+              className="w-full max-w-[500px] bg-white rounded-t-[32px] p-6 pb-12 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-lg font-bold text-white mb-4">
+              <h3 className="text-lg font-bold text-slate-800 mb-4">
                 {user.name}님에게 위로의 블록 보내기
               </h3>
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -141,7 +140,7 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="따뜻한 한마디를 적어주세요..."
-                  className="w-full h-24 bg-white/5 border border-white/10 rounded-2xl p-4 text-white placeholder-white/30 resize-none focus:outline-none focus:ring-2 focus:ring-[#ffb5a7] transition-all"
+                  className="w-full h-24 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-800 placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-brand-orange-dark/50 transition-all shadow-inner"
                   autoFocus
                 />
                 <Button type="submit" variant="primary" className="!bg-gradient-to-r !from-[#ffb5a7] !to-[#fcd5ce] !text-[#4a3b32] text-lg py-4 shadow-xl">

@@ -25,13 +25,16 @@ const PageHeader = ({ title, gradientColor = 'purple', action, onBack }: PageHea
     >
       <div className="flex items-center gap-3">
         {onBack && (
-          <button onClick={onBack} className="text-white/70 hover:text-white transition-colors cursor-pointer flex items-center justify-center p-1">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+          <button 
+            onClick={onBack} 
+            className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-full text-slate-600 hover:text-brand-orange shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 18l-6-6 6-6"/>
             </svg>
           </button>
         )}
-        <h2 className="text-2xl font-extrabold text-white m-0">{title}</h2>
+        <h2 className="text-2xl font-extrabold text-slate-800 m-0">{title}</h2>
       </div>
       {action && <div>{action}</div>}
     </header>

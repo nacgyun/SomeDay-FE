@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import type { MenuItemType } from '../types';
@@ -25,20 +25,44 @@ const WEEKLY_STRESS_DATA = [
   { day: '토', level: 25 },
   { day: '일', level: 55 },
 ];
-// ──────────────────────────────────────────────────────────────
+
+const getMyProfile = async (userId: number) => {
+  const response = await fetch(`https://someday-be-production.up.railway.app/api/my-profiles/${userId}`);
+  if (!response.ok) throw new Error('Failed to fetch profile: ' + response.status);
+  const result = await response.json();
+  return result;
+};
 
 const MyPage = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, profile, logout, updateProfile } = useAuth();
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+  useEffect(() => {
+    console.log('MyPage useEffect - user:', user, 'profile:', profile);
+    if (user?.id && !profile) {
+      console.log('Fetching profile for user ID:', user.id);
+      getMyProfile(user.id)
+        .then(data => {
+          console.log('Profile data fetched successfully:', data);
+          if (data) {
+            updateProfile(data);
+          } else {
+            console.warn('Profile data exists but is null/empty');
+          }
+        })
+        .catch(err => {
+          console.error('Failed to fetch profile:', err);
+        });
+    }
+  }, [user?.id, profile, updateProfile]);
 
   return (
-    <div className="min-h-screen bg-surface pb-20 text-white relative">
+    <div className="min-h-screen bg-[#F0ECE4] pb-20 text-slate-800 relative">
       <PageHeader title="마이페이지" gradientColor="orange" />
 
       {/* 프로필 카드 */}
@@ -46,7 +70,7 @@ const MyPage = () => {
         <ProfileCard
           name={user?.nickname || user?.name || '사용자님'}
           email={user?.email || 'user@someday.app'}
-          avatar="😊"
+          avatar={profile?.avatarEmoji || '😊'}
           onEdit={() => setIsAccountModalOpen(true)}
         />
       </section>
@@ -59,16 +83,16 @@ const MyPage = () => {
       {/* 4가지 요약 통계 */}
       <section className="px-5 mb-4">
         <MyStats
-          consecutiveDays={12}
-          towerFloors={34}
-          receivedCheers={5}
-          sentConsoles={8}
+          consecutiveDays={profile?.consecutiveDays || 0}
+          towerFloors={profile?.totalLayers || 0}
+          receivedCheers={profile?.cheersReceived || 0}
+          sentConsoles={profile?.cheersSent || 0}
         />
       </section>
 
       {/* 메뉴 리스트 */}
       <section className="px-5">
-        <div className="bg-white/[0.04] border border-white/[0.08] rounded-[20px] overflow-hidden">
+        <div className="bg-white border border-slate-100 rounded-[20px] overflow-hidden shadow-sm">
           {MENU_ITEMS.map((item, i) => (
             <MenuItem
               key={item.id}
@@ -86,30 +110,30 @@ const MyPage = () => {
 
       {/* 계정 설정 모달 */}
       {isAccountModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-5">
-          <div className="bg-surface-secondary border border-white/10 rounded-3xl w-full max-w-[360px] p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px] px-5">
+          <div className="bg-white border border-slate-100 rounded-3xl w-full max-w-[360px] p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-white">계정 설정</h3>
+              <h3 className="text-xl font-bold text-slate-800">계정 설정</h3>
               <button
                 onClick={() => setIsAccountModalOpen(false)}
-                className="text-white/50 hover:text-white transition-colors cursor-pointer text-xl"
+                className="text-slate-400 hover:text-slate-800 transition-colors cursor-pointer text-xl"
               >
                 ✕
               </button>
             </div>
 
             <div className="flex flex-col gap-3">
-              <Button variant="ghost" fullWidth className="!justify-start !px-5">
+              <Button variant="ghost" fullWidth className="!justify-start !px-5 text-slate-700 hover:bg-slate-50 border border-transparent hover:border-slate-100">
                 <span className="mr-2">🖼️</span> 사용자 프로필 사진 바꾸기
               </Button>
-              <Button variant="ghost" fullWidth className="!justify-start !px-5">
+              <Button variant="ghost" fullWidth className="!justify-start !px-5 text-slate-700 hover:bg-slate-50 border border-transparent hover:border-slate-100">
                 <span className="mr-2">✏️</span> 닉네임 변경하기
               </Button>
-              <Button variant="ghost" fullWidth className="!justify-start !px-5">
+              <Button variant="ghost" fullWidth className="!justify-start !px-5 text-slate-700 hover:bg-slate-50 border border-transparent hover:border-slate-100">
                 <span className="mr-2">📧</span> 이메일 변경하기
               </Button>
-              <div className="h-px bg-white/10 my-1" />
-              <Button variant="ghost" fullWidth className="!justify-start !px-5">
+              <div className="h-px bg-slate-100 my-1" />
+              <Button variant="ghost" fullWidth className="!justify-start !px-5 text-slate-700 hover:bg-slate-50 border border-transparent hover:border-slate-100">
                 <span className="mr-2">⚙️</span> 시스템 설정
               </Button>
               <Button variant="danger" fullWidth className="!justify-start !px-5" onClick={handleLogout}>
