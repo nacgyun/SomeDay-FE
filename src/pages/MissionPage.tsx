@@ -21,18 +21,18 @@ const MissionPage = () => {
     queryFn: async () => {
       if (!user?.id) return [];
       const response = await api.get(`/api/recovery-missions/${user.id}/recent`);
-
+      console.log(response.data)
       if (response.data && Array.isArray(response.data)) {
         const now = new Date();
         const todayStr = now.toISOString().split('T')[0]; // "2026-04-05" 형식 추출
-        
+
         // 오늘 날짜를 로컬 기준으로 정확히 잡기
         const today = new Date(todayStr);
         today.setHours(0, 0, 0, 0);
 
         return response.data.map((item: any) => {
           let dayOffset = 6;
-          
+
           if (item.missionDate) {
             // YYYY-MM-DD 형식을 로컬 날짜로 안전하게 변환
             const mDateParts = item.missionDate.split('-');
@@ -42,7 +42,7 @@ const MissionPage = () => {
               parseInt(mDateParts[2])
             );
             missionDate.setHours(0, 0, 0, 0);
-            
+
             const diffTime = today.getTime() - missionDate.getTime();
             const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
             dayOffset = 6 - diffDays;
@@ -52,7 +52,7 @@ const MissionPage = () => {
             ...item,
             id: item.id || Math.random(),
             dayOffset: dayOffset,
-            done: item.completed 
+            done: item.completed
           } as Mission;
         });
       }
@@ -88,7 +88,7 @@ const MissionPage = () => {
   });
 
   // 선택된 날짜의 미션들만 필터링 및 생성 시간(createdAt) 기준 정렬 (최신순)
-  const displayedMissions = useMemo(() => 
+  const displayedMissions = useMemo(() =>
     missions
       .filter(m => m.dayOffset === selectedDayOffset)
       .sort((a, b) => {

@@ -17,30 +17,40 @@ interface SocialFeedItemProps {
   user: SocialUser;
   isActive: boolean;
   isRendered: boolean;
-  onComfort: (userId: number, message: string) => void;
+  onComfort: (userId: number, message: string) => Promise<void>;
 }
 
 const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedItemProps) => {
   const [showComfortModal, setShowComfortModal] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [message, setMessage] = useState('');
   const [particles, setParticles] = useState<{ id: number; x: number }[]>([]);
 
   const { tower, blocks, isLoading } = useTowerData(user.id);
   const stabilityScore = tower?.stability_score ?? 100;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
-    onComfort(user.id, message);
-    setMessage('');
-    setShowComfortModal(false);
 
-    const newParticles = Array.from({ length: 6 }).map((_, i) => ({
-      id: Date.now() + i,
-      x: Math.random() * 80 - 40,
-    }));
-    setParticles((prev) => [...prev, ...newParticles]);
-    setTimeout(() => setParticles([]), 2500);
+    setIsSending(true);
+    try {
+      await onComfort(user.id, message);
+      setMessage('');
+      setShowComfortModal(false);
+
+      // 성공 파티클 효과
+      const newParticles = Array.from({ length: 6 }).map((_, i) => ({
+        id: Date.now() + i,
+        x: Math.random() * 80 - 40,
+      }));
+      setParticles((prev) => [...prev, ...newParticles]);
+      setTimeout(() => setParticles([]), 2500);
+    } catch (error) {
+      console.error('Failed to send comfort message:', error);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -77,27 +87,25 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
       <div className="absolute left-6 top-[55%] -translate-y-1/2 z-10 pointer-events-none flex flex-col items-center">
         <div className="w-10 h-80 rounded-full overflow-visible bg-slate-300/50 shadow-inner relative flex flex-col justify-end">
           <div
-            className={`w-full rounded-full transition-all duration-1000 ${
-              stabilityScore <= 30 ? 'bg-red-500 animate-pulse' :
-              stabilityScore <= 60 ? 'bg-amber-400' :
-              'bg-emerald-400'
-            }`}
+            className={`w-full rounded-full transition-all duration-1000 ${stabilityScore <= 30 ? 'bg-red-500 animate-pulse' :
+                stabilityScore <= 60 ? 'bg-amber-400' :
+                  'bg-emerald-400'
+              }`}
             style={{
               height: `${stabilityScore}%`,
               filter: stabilityScore <= 30
                 ? 'drop-shadow(0 0 10px rgba(239,68,68,0.9))'
                 : stabilityScore <= 60
-                ? 'drop-shadow(0 0 6px rgba(251,191,36,0.8))'
-                : 'drop-shadow(0 0 6px rgba(52,211,153,0.8))',
+                  ? 'drop-shadow(0 0 6px rgba(251,191,36,0.8))'
+                  : 'drop-shadow(0 0 6px rgba(52,211,153,0.8))',
             }}
           />
         </div>
         <div className="mt-3 text-center">
-          <p className={`text-[14px] font-extrabold ${
-            stabilityScore <= 30 ? 'text-red-500' :
-            stabilityScore <= 60 ? 'text-amber-500' :
-            'text-emerald-500'
-          }`}>{stabilityScore}%</p>
+          <p className={`text-[14px] font-extrabold ${stabilityScore <= 30 ? 'text-red-500' :
+              stabilityScore <= 60 ? 'text-amber-500' :
+                'text-emerald-500'
+            }`}>{stabilityScore}%</p>
           <p className="text-[11px] font-bold text-slate-400">안정도</p>
         </div>
       </div>
@@ -144,11 +152,29 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="relative w-full max-w-[400px] bg-white rounded-3xl p-7 shadow-2xl border border-slate-100"
+              className="relative w-full max-w-[400px] bg-white rounded-3xl p-7 shadow-2xl border border-slate-100 overflow-hidden"
             >
+              {/* 전송 중 애니메이션 오버레이 */}
+              {isSending && (
+                <div className="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center animate-fade-in">
+                  <div className="relative mb-4">
+                    <div className="absolute inset-x-0 bottom-0 h-2 bg-brand-green/20 blur-md rounded-full" />
+                    <img src={todakIcon} alt="토닥토닥" className="w-16 h-16 object-contain animate-patting" />
+                  </div>
+                  <p className="text-slate-800 font-extrabold text-lg tracking-tight">
+                    마음을 전달하는 중...
+                  </p>
+                  <div className="mt-2 flex gap-1">
+                    <span className="w-1.5 h-1.5 bg-brand-green rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <span className="w-1.5 h-1.5 bg-brand-green rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <span className="w-1.5 h-1.5 bg-brand-green rounded-full animate-bounce" />
+                  </div>
+                </div>
+              )}
+
               <h3 className="text-xl font-extrabold text-slate-800 mb-2">따뜻한 마음 전하기</h3>
               <p className="text-sm text-slate-500 mb-6">{user.nickname}님에게 응원의 메시지를 남겨주세요.</p>
-              
+
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <input
                   autoFocus

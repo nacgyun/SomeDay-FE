@@ -41,16 +41,16 @@ const MyPage = () => {
     queryFn: async () => {
       if (!user?.id) return [];
       const response = await api.get(`/api/mental-analyses/${user.id}/weekly-stability`);
-
+      console.log(response.data)
       if (response.data && response.data.scores) {
         const days = ['일', '월', '화', '수', '목', '금', '토'];
         const result = [];
-        
+
         // 오늘부터 6일 전까지, 총 7일의 데이터를 생성 (오른쪽이 오늘)
         for (let i = 6; i >= 0; i--) {
           const targetDate = new Date();
           targetDate.setDate(targetDate.getDate() - i);
-          
+
           // YYYY-MM-DD 형식으로 변환 (로컬 기준)
           const year = targetDate.getFullYear();
           const month = String(targetDate.getMonth() + 1).padStart(2, '0');
@@ -62,7 +62,7 @@ const MyPage = () => {
             const sDate = s.analysisDate || s.date;
             return sDate && (sDate === dateStr || sDate.includes(dateStr));
           });
-          
+
           result.push({
             day: days[targetDate.getDay()],
             // 데이터가 아예 없으면 null 전달 (0점과 구분)
