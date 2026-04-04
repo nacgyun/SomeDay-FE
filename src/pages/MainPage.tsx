@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useTowerData } from '../hooks/useTowerData';
@@ -12,6 +13,8 @@ type ModalMode = 'diary' | 'survey';
 const MainPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { search } = useLocation();
+
 
   const { tower, blocks, isLoading, isError } = useTowerData(user?.id);
 
@@ -29,6 +32,16 @@ const MainPage = () => {
       return () => clearTimeout(timer);
     }
   }, [blocks]);
+
+  // 튜토리얼 등에서 넘어온 경우 자동 일기 모달 열기
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    if (params.get('openDiary') === 'true') {
+      openModal('diary');
+      // 처리 후 파라미터 제거
+      navigate('/main', { replace: true });
+    }
+  }, [search, navigate]);
 
   const openModal = (mode: ModalMode) => {
     setModalMode(mode);
@@ -122,12 +135,27 @@ const MainPage = () => {
               {isStable ? '생글생글 웃고있는' : '휴... 기운없는'}<br />
               {userName}님의 타워
             </h2>
-            <button className="pointer-events-auto bg-transparent border-none cursor-pointer">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isStable ? '#f97316' : '#334155'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-            </button>
+            <div className="flex items-center gap-3 pointer-events-auto bg-transparent">
+              {/* 가이드 아이콘 */}
+              <button 
+                onClick={() => navigate('/guide')} 
+                className="bg-white/40 backdrop-blur-sm w-9 h-9 rounded-full flex items-center justify-center border border-white/20 cursor-pointer transition-all hover:bg-white/60 active:scale-90 shadow-sm"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5a4a3a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </button>
+              
+              {/* 알림 아이콘 */}
+              <button className="bg-white/40 backdrop-blur-sm w-9 h-9 rounded-full flex items-center justify-center border border-white/20 cursor-pointer transition-all hover:bg-white/60 active:scale-90 shadow-sm">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isStable ? '#f97316' : '#334155'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 

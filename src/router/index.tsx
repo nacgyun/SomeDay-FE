@@ -6,6 +6,7 @@ import SocialPage from '../pages/SocialPage';
 import MissionPage from '../pages/MissionPage';
 import MyPage from '../pages/MyPage';
 import MyRecordsPage from '../pages/MyRecordsPage';
+import GuidePage from '../pages/GuidePage';
 import MainLayout from '../layouts/MainLayout';
 
 const AppRouter = () => {
@@ -19,6 +20,7 @@ const AppRouter = () => {
 
         {/* 네비 없는 독립 페이지들 */}
         <Route path="/my/records" element={<MyRecordsPage />} />
+        <Route path="/guide" element={<GuidePage />} />
 
         {/* 하단 네비 있는 페이지들 */}
         <Route element={<MainLayout />}>
