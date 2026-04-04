@@ -18,6 +18,7 @@ export interface Mission {
   category: string;
   done: boolean;
   point: number;
+  dayOffset?: number; // 0 = 6 days ago, ..., 6 = today
 }
 
 export interface StatItem {
@@ -45,8 +46,6 @@ export interface NavItem {
   icon: string;
   label: string;
 }
-
-export type MissionCategory = '전체' | '운동' | '자기계발' | '건강' | '마음챙김' | '루틴';
 
 export interface User {
   id: number;

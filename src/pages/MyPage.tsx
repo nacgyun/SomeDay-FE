@@ -111,7 +111,7 @@ const MyPage = () => {
       {/* 계정 설정 모달 */}
       {isAccountModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px] px-5">
-          <div className="bg-white border border-slate-100 rounded-3xl w-full max-w-[360px] p-6 shadow-2xl">
+          <div className="bg-[#F7F3EB] border border-slate-100 rounded-3xl w-full max-w-[360px] p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-slate-800">계정 설정</h3>
               <button
@@ -123,20 +123,51 @@ const MyPage = () => {
             </div>
 
             <div className="flex flex-col gap-3">
-              <Button variant="ghost" fullWidth className="!justify-start !px-5 text-slate-700 hover:bg-slate-50 border border-transparent hover:border-slate-100">
+              {/* 프로필 변경 */}
+              <Button
+                variant="ghost"
+                fullWidth
+                className="!justify-start !px-5 !bg-white !text-slate-600 hover:bg-slate-50 border border-slate-100 shadow-sm"
+              >
                 <span className="mr-2">🖼️</span> 사용자 프로필 사진 바꾸기
               </Button>
-              <Button variant="ghost" fullWidth className="!justify-start !px-5 text-slate-700 hover:bg-slate-50 border border-transparent hover:border-slate-100">
+
+              {/* 닉네임 변경 */}
+              <Button
+                variant="ghost"
+                fullWidth
+                className="!justify-start !px-5 !bg-white !text-slate-600 hover:bg-slate-50 border border-slate-100 shadow-sm"
+              >
                 <span className="mr-2">✏️</span> 닉네임 변경하기
               </Button>
-              <Button variant="ghost" fullWidth className="!justify-start !px-5 text-slate-700 hover:bg-slate-50 border border-transparent hover:border-slate-100">
+
+              {/* 이메일 변경 */}
+              <Button
+                variant="ghost"
+                fullWidth
+                className="!justify-start !px-5 !bg-white !text-slate-600 hover:bg-slate-50 border border-slate-100 shadow-sm"
+              >
                 <span className="mr-2">📧</span> 이메일 변경하기
               </Button>
-              <div className="h-px bg-slate-100 my-1" />
-              <Button variant="ghost" fullWidth className="!justify-start !px-5 text-slate-700 hover:bg-slate-50 border border-transparent hover:border-slate-100">
+
+              <div className="h-px bg-slate-300 my-1 " />
+
+              {/* 시스템 설정 */}
+              <Button
+                variant="ghost"
+                fullWidth
+                className="!justify-start !px-5 !bg-white !text-slate-600 hover:bg-slate-50 border border-slate-100 shadow-sm"
+              >
                 <span className="mr-2">⚙️</span> 시스템 설정
               </Button>
-              <Button variant="danger" fullWidth className="!justify-start !px-5" onClick={handleLogout}>
+
+              {/* 로그아웃 (기존 유지 혹은 이것도 바꾸고 싶으시면 !text-slate-600 추가) */}
+              <Button
+                variant="danger"
+                fullWidth
+                className="!justify-start !px-5"
+                onClick={handleLogout}
+              >
                 <span className="mr-2">🚪</span> 로그아웃
               </Button>
             </div>

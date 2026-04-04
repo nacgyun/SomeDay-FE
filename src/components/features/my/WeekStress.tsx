@@ -11,15 +11,15 @@ const WeekStress = ({ data }: WeekStressProps) => {
   const maxLevel = 100;
 
   const getBarColorInfo = (level: number) => {
-    if (level < 40) return { bg: 'bg-brand-green', shadow: 'shadow-brand-green/40' };
+    if (level < 40) return { bg: 'bg-brand-red', shadow: 'shadow-brand-red/40' };
     if (level < 75) return { bg: 'bg-brand-orange', shadow: 'shadow-brand-orange/40' };
-    return { bg: 'bg-brand-red', shadow: 'shadow-brand-red/40' };
+    return { bg: 'bg-brand-green', shadow: 'shadow-brand-green/40' };
   };
 
   return (
     <div className="bg-[#B6754C] shadow-md rounded-[20px] p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-white">주간 스트레스 수치</h3>
+        <h3 className="text-sm font-semibold text-white">주간 안정도 수치</h3>
         <span className="text-xs text-white/80 font-medium">최근 7일</span>
       </div>
 

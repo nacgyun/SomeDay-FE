@@ -1,30 +1,79 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../components/layout/PageHeader';
 import Button from '../components/ui/Button';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../api/axios';
 
-// 더미 데이터: 날짜별 기록
-const MOCK_RECORDS: Record<string, { content: string; emotion: string; stress: number }> = {
-  '2026-04-01': { content: '오늘은 새 프로젝트를 시작했다. 설레지만 조금 긴장된다.', emotion: '😊', stress: 30 },
-  '2026-04-03': { content: '비가 와서 달리기 대신 집에서 명상을 했다.', emotion: '🧘', stress: 20 },
-  '2026-04-06': { content: '업무가 너무 많아서 야근을 했다. 피곤한 하루...', emotion: '😫', stress: 85 },
-  '2026-04-10': { content: '친구들과 주말 약속을 잡았다. 기대된다!', emotion: '🎉', stress: 15 },
-  '2026-04-15': { content: '생각보다 일이 잘 안 풀려서 답답했다. 조금 쉬어가야지.', emotion: '🌧️', stress: 70 },
-  '2026-04-22': { content: '컨디션이 아주 좋은 날. 집중이 잘 돼서 목표치를 다 채웠다.', emotion: '✨', stress: 10 },
-  '2026-04-28': { content: '가벼운 산책을 하며 생각을 정리했다. 한결 낫다.', emotion: '🍃', stress: 45 },
+interface MonthlySummary {
+  analysisDate: string;
+  stabilityScore: number;
+  mentalState: string;
+}
+
+interface RecordDetail {
+  content: string;
+  emotion: string;
+  stress: number;
+}
+
+const getEmotionByScore = (score: number): string => {
+  if (score >= 90) return '✨';
+  if (score >= 70) return '😊';
+  if (score >= 50) return '🧘';
+  if (score >= 30) return '🍃';
+  return '😫';
 };
 
 const MyRecordsPage = () => {
   const navigate = useNavigate();
-  // 기본 설정: 2026년 4월
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1)); // month is 0-indexed
+  const { user } = useAuth();
+
+  // 기본 설정: 오늘 날짜의 연/월
+  const now = new Date();
+  const [currentDate, setCurrentDate] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
   const [selectedRecordDate, setSelectedRecordDate] = useState<string | null>(null);
+
+  const [records, setRecords] = useState<Record<string, RecordDetail>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1; // 1-indexed for display
 
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [pickerYear, setPickerYear] = useState(year);
+
+  const fetchMonthlySummaries = useCallback(async () => {
+    if (!user?.id) return;
+
+    setIsLoading(true);
+    try {
+      const response = await api.get(`/api/mental-analyses/${user.id}/monthly-summaries`, {
+        params: { year, month }
+      });
+
+      if (response.data) {
+        const mappedRecords: Record<string, RecordDetail> = {};
+        response.data.forEach((item: MonthlySummary) => {
+          mappedRecords[item.analysisDate] = {
+            content: item.mentalState,
+            emotion: getEmotionByScore(item.stabilityScore),
+            stress: item.stabilityScore // UI에서는 stress로 쓰이지만 안정도 수치로 표시함
+          };
+        });
+        setRecords(mappedRecords);
+      }
+    } catch (error) {
+      console.error('Failed to fetch monthly summaries:', error);
+      setRecords({});
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.id, year, month]);
+
+  useEffect(() => {
+    fetchMonthlySummaries();
+  }, [fetchMonthlySummaries]);
 
   const openPicker = () => {
     setPickerYear(year);
@@ -59,7 +108,7 @@ const MyRecordsPage = () => {
     days.push(i);
   }
 
-  const selectedRecord = selectedRecordDate ? MOCK_RECORDS[selectedRecordDate] : null;
+  const selectedRecord = selectedRecordDate ? records[selectedRecordDate] : null;
 
   return (
     <div className="w-full max-w-[480px] mx-auto min-h-screen relative bg-[#F0ECE4] shadow-2xl shadow-black/20 text-slate-800 flex flex-col">
@@ -105,7 +154,7 @@ const MyRecordsPage = () => {
         </div>
 
         {/* 달력 그리드 */}
-        <div className="grid grid-cols-7 gap-y-4 gap-x-2">
+        <div className={`grid grid-cols-7 gap-y-4 gap-x-2 transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
           {days.map((day, idx) => {
             if (day === null) {
               return <div key={`empty-${idx}`} />;
@@ -114,7 +163,7 @@ const MyRecordsPage = () => {
             const formattedMonth = String(month).padStart(2, '0');
             const formattedDay = String(day).padStart(2, '0');
             const dateStr = `${year}-${formattedMonth}-${formattedDay}`;
-            const hasRecord = !!MOCK_RECORDS[dateStr];
+            const hasRecord = !!records[dateStr];
 
             return (
               <div key={dateStr} className="flex flex-col items-center gap-1.5">
@@ -163,7 +212,7 @@ const MyRecordsPage = () => {
               <h3 className="text-[15px] font-bold text-brand-orange-dark mb-1">
                 {selectedRecordDate}
               </h3>
-              <p className="text-xs text-slate-500 mb-6 font-medium">스트레스 지수: <span className="text-brand-orange font-bold">{selectedRecord.stress}</span></p>
+              <p className="text-xs text-slate-500 mb-6 font-medium">안정도 지수: <span className="text-brand-orange font-bold">{selectedRecord.stress}</span></p>
 
               <div className="w-full bg-slate-50/80 rounded-2xl p-5 border border-slate-100 relative overflow-hidden shadow-inner">
                 <div className="absolute top-2 left-3 text-4xl text-slate-200/60 font-serif pointer-events-none">"</div>
