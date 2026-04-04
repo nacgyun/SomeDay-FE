@@ -1,22 +1,13 @@
 import { useState } from 'react';
-import type { TowerData, BlockData } from '../main/JengaTower3D';
 import JengaTower3D from '../main/JengaTower3D';
 import { AnimatePresence, motion } from 'framer-motion';
-import Button from '../../ui/Button';
-
-export interface FeedUser {
-  id: number;
-  name: string;
-  avatar: string;
-  statusMessage: string;
-  tower: TowerData;
-  blocks: BlockData[];
-}
+import { useTowerData } from '../../../hooks/useTowerData';
+import type { SocialUser } from '../../../hooks/useSocialFeed';
 
 interface SocialFeedItemProps {
-  user: FeedUser;
+  user: SocialUser;
   isActive: boolean;
-  isRendered: boolean; // active +- 1 일 때만 렌더링
+  isRendered: boolean;
   onComfort: (userId: number, message: string) => void;
 }
 
@@ -25,10 +16,11 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
   const [message, setMessage] = useState('');
   const [particles, setParticles] = useState<{ id: number; x: number }[]>([]);
 
-  const isStable = user.tower.stability_score >= 60;
-  const bgGradient = isStable
-    ? 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/60 via-transparent to-transparent'
-    : 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent';
+  // 💡 useSocialFeed에서 setQueryData를 해두었으므로 로딩 없이 즉시 렌더링됨
+  const { tower, blocks, isLoading } = useTowerData(user.id);
+
+  const stabilityScore = tower?.stability_score ?? 100;
+  const isStable = stabilityScore >= 60;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,118 +29,121 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
     setMessage('');
     setShowComfortModal(false);
 
-    // 파티클 생성 로직
     const newParticles = Array.from({ length: 6 }).map((_, i) => ({
       id: Date.now() + i,
-      x: Math.random() * 80 - 40, // 뷰포트 중앙 기준 좌우 오프셋 퍼센트
+      x: Math.random() * 80 - 40,
     }));
     setParticles((prev) => [...prev, ...newParticles]);
-
-    // 2초 뒤 파티클 제거
-    setTimeout(() => {
-      setParticles([]);
-    }, 2500);
+    setTimeout(() => setParticles([]), 2500);
   };
 
   return (
-    <div className={`relative w-full h-screen snap-center overflow-hidden snap-always flex-shrink-0 ${bgGradient}`}>
-      {/* 3D 타워 캔버스 (isRendered가 참일때만 마운트) */}
-      {isRendered ? (
-        <div className="absolute inset-0 z-0 transition-opacity duration-700" style={{ opacity: isActive ? 1 : 0.4 }}>
-          <JengaTower3D tower={user.tower} blocks={user.blocks} />
-        </div>
-      ) : (
-        <div className="absolute inset-0 flex items-center justify-center">
-          {/* 렌더링되지 않을 때의 플레이스홀더 */}
-          <div className="w-10 h-10 border-4 border-slate-300 border-t-transparent rounded-full animate-spin opacity-40"></div>
+    <div className={`relative w-full h-screen snap-center overflow-hidden snap-always flex-shrink-0 bg-[#F0ECE4]`}>
+      {isRendered && (
+        <div className={`absolute inset-0 z-0 transition-opacity duration-700 ${isActive ? 'opacity-100' : 'opacity-40'}`}>
+          {isLoading || !tower ? (
+            <div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-3 border-brand-purple/20 border-t-brand-purple rounded-full animate-spin" /></div>
+          ) : (
+            <JengaTower3D tower={tower} blocks={blocks} />
+          )}
         </div>
       )}
 
-      {/* 좌측 유저 정보 및 안정도 */}
-      <div className="absolute top-[80px] left-5 z-20 pointer-events-none drop-shadow-md">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-3xl">{user.avatar}</span>
+      {/* 유저 정보 */}
+      <div className="absolute top-[100px] left-6 z-20 pointer-events-none">
+        <div className="flex items-center gap-3">
+          <span className="text-4xl drop-shadow-md">{user.avatarEmoji}</span>
           <div>
-            <h2 className="text-xl font-bold text-slate-800 leading-tight">{user.name}님의 타워</h2>
-            <p className="text-sm text-slate-600">{user.statusMessage}</p>
+            <h2 className="text-xl font-bold text-slate-800 drop-shadow-sm">{user.nickname}</h2>
+            <p className="text-sm text-slate-500 font-medium">{user.comment}</p>
           </div>
         </div>
       </div>
 
-      {/* 안정도 인디케이터 */}
-      <div className="absolute left-5 top-[55%] -translate-y-1/2 z-10 pointer-events-none flex flex-col items-center">
-        <div className="w-2.5 h-32 rounded-full overflow-hidden bg-slate-300/50 shadow-inner">
-          <div
-            className={`w-full rounded-full transition-all duration-1000 ${isStable ? 'bg-brand-orange shadow-sm' : 'bg-slate-400'}`}
-            style={{ height: `${user.tower.stability_score}%`, marginTop: `${100 - user.tower.stability_score}%` }}
+      {/* 안정도 바 */}
+      <div className="absolute left-6 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2">
+        <div className="w-2 h-32 rounded-full bg-slate-300/50 shadow-inner overflow-hidden">
+          <motion.div
+            className={`w-full ${isStable ? 'bg-brand-purple' : 'bg-slate-400'}`}
+            initial={{ height: 0 }}
+            animate={{ height: `${stabilityScore}%` }}
+            transition={{ duration: 1, type: 'spring' }}
+            style={{ marginTop: 'auto' }}
           />
         </div>
-        <div className="mt-2 text-center">
-          <p className="text-[12px] font-extrabold text-slate-800">{user.tower.stability_score}%</p>
-          <p className="text-[10px] font-bold text-slate-500">안정도</p>
-        </div>
+        <span className="text-xs font-black text-slate-800">{stabilityScore}%</span>
       </div>
 
-      {/* 우측 하단 토닥토닥 위로 버튼 */}
-      <div className="absolute bottom-[110px] right-5 z-20">
-        <button
-          onClick={() => setShowComfortModal(true)}
-          className="flex flex-col items-center justify-center gap-1 group"
-        >
-          <div className="w-14 h-14 bg-gradient-to-tr from-[#ffb5a7] to-[#fcd5ce] rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(255,181,167,0.4)] transition-transform group-hover:scale-110 group-active:scale-95">
-            <span className="text-2xl">💖</span>
+      {/* 토닥토닥 버튼 */}
+      <div className="absolute bottom-32 right-6 z-30">
+        <button onClick={() => setShowComfortModal(true)} className="flex flex-col items-center gap-2 group">
+          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border border-slate-100 shadow-xl group-active:scale-95 transition-transform">
+            <span className="text-3xl">💖</span>
           </div>
-          <span className="text-[11px] font-bold text-slate-700 drop-shadow-sm">토닥토닥</span>
+          <span className="text-[12px] font-bold text-slate-500">토닥토닥</span>
         </button>
       </div>
 
-      {/* 메시지 작성 모달 (BottomSheet 형태) */}
+      {/* 파티클 및 모달 생략 (동일) */}
       <AnimatePresence>
         {particles.map((p) => (
           <motion.div
             key={p.id}
-            initial={{ opacity: 0, y: 0, scale: 0.5, x: `${p.x}vw` }}
-            animate={{ opacity: [0, 1, 1, 0], y: -300, scale: [0.5, 1.2, 1], rotate: [0, -20, 20, 0] }}
-            transition={{ duration: 2, ease: "easeOut" }}
-            className="absolute top-1/2 left-1/2 -ml-4 z-40 pointer-events-none drop-shadow-lg"
+            initial={{ y: 0, opacity: 1, scale: 0.5 }}
+            animate={{ y: -120, opacity: 0, scale: 1.8 }}
+            exit={{ opacity: 0 }}
+            className="absolute bottom-40 right-10 text-3xl z-50 pointer-events-none"
+            style={{ x: p.x }}
           >
-            <span className="text-4xl">💖</span>
+            💖
           </motion.div>
         ))}
 
         {showComfortModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 flex items-end justify-center bg-black/30 backdrop-blur-[2px]"
-            onClick={() => setShowComfortModal(false)}
-          >
+          <div className="fixed inset-0 z-[100] flex items-end justify-center px-4 pb-10">
             <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="w-full max-w-[500px] bg-white rounded-t-[32px] p-6 pb-12 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowComfortModal(false)}
+              className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              className="relative w-full max-w-[400px] bg-white rounded-3xl p-7 shadow-2xl border border-slate-100"
             >
-              <h3 className="text-lg font-bold text-slate-800 mb-4">
-                {user.name}님에게 위로의 블록 보내기
-              </h3>
+              <h3 className="text-xl font-extrabold text-slate-800 mb-2">따뜻한 마음 전하기</h3>
+              <p className="text-sm text-slate-500 mb-6">{user.nickname}님에게 응원의 메시지를 남겨주세요.</p>
+              
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <textarea
+                <input
+                  autoFocus
+                  type="text"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="따뜻한 한마디를 적어주세요..."
-                  className="w-full h-24 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-800 placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-brand-orange-dark/50 transition-all shadow-inner"
-                  autoFocus
+                  placeholder="응원의 한마디를 적어보세요..."
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-slate-800 outline-none focus:border-brand-purple/50 transition-colors shadow-inner"
                 />
-                <Button type="submit" variant="primary" className="!bg-gradient-to-r !from-[#ffb5a7] !to-[#fcd5ce] !text-[#4a3b32] text-lg py-4 shadow-xl">
-                  위로 보내기 💖
-                </Button>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowComfortModal(false)}
+                    className="flex-1 py-4 rounded-xl font-bold text-slate-400 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer border-none"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-[2] py-4 rounded-xl font-bold text-white bg-gradient-to-r from-brand-purple to-brand-blue shadow-lg shadow-brand-purple/20 active:scale-95 transition-transform cursor-pointer border-none"
+                  >
+                    보내기 💖
+                  </button>
+                </div>
               </form>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

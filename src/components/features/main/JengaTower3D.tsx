@@ -139,7 +139,7 @@ const JengaTower3D = ({ tower, blocks }: JengaTower3DProps) => {
   return (
     <div className="w-full h-full absolute inset-0 z-0 pointer-events-auto flex items-center justify-center">
       <Canvas
-        shadows
+        shadows="soft" // 'soft' (PCFSoftShadowMap) 또는 'basic' (PCFShadowMap) 중 선택 가능
         camera={{ position: cameraPos, fov: 48, near: 0.1, far: 120 }}
         gl={{ antialias: true, alpha: true }}
         onCreated={({ camera }) => {

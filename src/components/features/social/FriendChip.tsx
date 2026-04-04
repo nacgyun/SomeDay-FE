@@ -8,14 +8,14 @@ const FriendChip = ({ avatar, name }: FriendChipProps) => {
     <div className="flex flex-col items-center gap-1.5 flex-shrink-0 cursor-pointer">
       <div
         className={[
-          'w-[52px] h-[52px] flex items-center justify-center',
-          'bg-white/[0.08] border-2 border-brand-blue/40 rounded-full text-2xl',
-          'transition-all duration-200 hover:border-brand-blue hover:bg-brand-blue/15',
+          'w-[54px] h-[54px] flex items-center justify-center',
+          'bg-white border-2 border-slate-100 rounded-full text-2xl shadow-sm',
+          'transition-all duration-200 hover:border-brand-blue/50 hover:bg-slate-50',
         ].join(' ')}
       >
         {avatar}
       </div>
-      <span className="text-[11px] text-white/50">{name}</span>
+      <span className="text-[11px] font-bold text-slate-500">{name}</span>
     </div>
   );
 };
