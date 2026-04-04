@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../contexts/AuthContext';
 import type { MenuItemType } from '../types';
 import PageHeader from '../components/layout/PageHeader';
@@ -9,18 +8,29 @@ import WeekStress from '../components/features/my/WeekStress';
 import MyStats from '../components/features/my/MyStats';
 import MenuItem from '../components/features/my/MenuItem';
 import Button from '../components/ui/Button';
-import api from '../api/axios';
 
-// ─── 메뉴 항목 ──────────────────────────────────────────────
+// ─── 더미 데이터 ──────────────────────────────────────────────
 const MENU_ITEMS: MenuItemType[] = [
   { id: 'history', icon: '📊', label: '나의 기록' },
   { id: 'inquiry', icon: '💬', label: '문의하기' },
   { id: 'terms', icon: '📄', label: '이용약관' },
 ];
 
+const WEEKLY_STRESS_DATA = [
+  { day: '월', level: 65 },
+  { day: '화', level: 82 },
+  { day: '수', level: 45 },
+  { day: '목', level: 30 },
+  { day: '금', level: 90 },
+  { day: '토', level: 25 },
+  { day: '일', level: 55 },
+];
+
 const getMyProfile = async (userId: number) => {
-  const response = await api.get(`/api/my-profiles/${userId}`);
-  return response.data;
+  const response = await fetch(`https://someday-be-production.up.railway.app/api/my-profiles/${userId}`);
+  if (!response.ok) throw new Error('Failed to fetch profile: ' + response.status);
+  const result = await response.json();
+  return result;
 };
 
 const MyPage = () => {
@@ -32,33 +42,17 @@ const MyPage = () => {
     logout();
     navigate('/login');
   };
-
-  // 주간 안정도 수치 API 연동
-  const { data: weeklyData = [] } = useQuery({
-    queryKey: ['weeklyStability', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return [];
-      const response = await api.get(`/api/mental-analyses/${user.id}/weekly-stability`);
-
-      if (response.data && response.data.scores) {
-        const days = ['일', '월', '화', '수', '목', '금', '토'];
-        return response.data.scores.map((item: any) => ({
-          day: days[new Date(item.date).getDay()],
-          level: item.stabilityScore || 0
-        }));
-      }
-      return [];
-    },
-    enabled: !!user?.id,
-    staleTime: 1000 * 60 * 5
-  });
-
   useEffect(() => {
+    console.log('MyPage useEffect - user:', user, 'profile:', profile);
     if (user?.id && !profile) {
+      console.log('Fetching profile for user ID:', user.id);
       getMyProfile(user.id)
         .then(data => {
+          console.log('Profile data fetched successfully:', data);
           if (data) {
             updateProfile(data);
+          } else {
+            console.warn('Profile data exists but is null/empty');
           }
         })
         .catch(err => {
@@ -68,7 +62,7 @@ const MyPage = () => {
   }, [user?.id, profile, updateProfile]);
 
   return (
-    <div className="min-h-screen bg-[#F0ECE4] pb-20 text-slate-800 relative font-sans">
+    <div className="min-h-screen bg-[#F0ECE4] pb-20 text-slate-800 relative">
       <PageHeader title="마이페이지" gradientColor="orange" />
 
       {/* 프로필 카드 */}
@@ -81,9 +75,9 @@ const MyPage = () => {
         />
       </section>
 
-      {/* 주간 안정도 변화 카드 */}
+      {/* 주간 스트레스 변화 카드 */}
       <section className="px-5 mb-4">
-        <WeekStress data={weeklyData} />
+        <WeekStress data={WEEKLY_STRESS_DATA} />
       </section>
 
       {/* 4가지 요약 통계 */}
@@ -117,7 +111,7 @@ const MyPage = () => {
       {/* 계정 설정 모달 */}
       {isAccountModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px] px-5">
-          <div className="bg-[#F7F3EB] border border-slate-100 rounded-3xl w-full max-w-[360px] p-6 shadow-2xl animate-fade-in-up">
+          <div className="bg-[#F7F3EB] border border-slate-100 rounded-3xl w-full max-w-[360px] p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-slate-800">계정 설정</h3>
               <button
@@ -129,14 +123,16 @@ const MyPage = () => {
             </div>
 
             <div className="flex flex-col gap-3">
+              {/* 프로필 변경 */}
               <Button
                 variant="ghost"
                 fullWidth
                 className="!justify-start !px-5 !bg-white !text-slate-600 hover:bg-slate-50 border border-slate-100 shadow-sm"
               >
-                <span className="mr-2">🖼️</span> 사용자 이모티콘 바꾸기
+                <span className="mr-2">🖼️</span> 사용자 프로필 사진 바꾸기
               </Button>
 
+              {/* 닉네임 변경 */}
               <Button
                 variant="ghost"
                 fullWidth
@@ -145,6 +141,7 @@ const MyPage = () => {
                 <span className="mr-2">✏️</span> 닉네임 변경하기
               </Button>
 
+              {/* 이메일 변경 */}
               <Button
                 variant="ghost"
                 fullWidth
@@ -153,8 +150,9 @@ const MyPage = () => {
                 <span className="mr-2">📧</span> 이메일 변경하기
               </Button>
 
-              <div className="h-px bg-slate-200 my-1 " />
+              <div className="h-px bg-slate-300 my-1 " />
 
+              {/* 시스템 설정 */}
               <Button
                 variant="ghost"
                 fullWidth
@@ -163,6 +161,7 @@ const MyPage = () => {
                 <span className="mr-2">⚙️</span> 시스템 설정
               </Button>
 
+              {/* 로그아웃 (기존 유지 혹은 이것도 바꾸고 싶으시면 !text-slate-600 추가) */}
               <Button
                 variant="danger"
                 fullWidth
