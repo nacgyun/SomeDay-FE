@@ -1,0 +1,40 @@
+name: git push into another repo to deploy to vercel
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 # 최신 버전 권장
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22 # 아까 설치한 LTS 버전과 맞춤
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Project
+        run: npm run build
+        # 여기서 'dist' 폴더가 생성됩니다.
+      - name: Clean up internal git
+        run: rm -rf .git
+
+      - name: Pushes to another repository
+        id: push_directory
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.NACGYUN_GITHUB_KEY }}
+        with:
+          source-directory: '.' # Vite 기본 빌드 폴더인 'dist'로 변경!
+          destination-github-username: 'nacgyun'
+          destination-repository-name: 'SomeDay-FE'
+          user-email: ${{ secrets.NACGYUN_ACCOUNT_EMAIL }}
+          commit-message: ${{ github.event.head_commit.message }}
+          target-branch: main
+          exclude: '.git'
