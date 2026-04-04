@@ -1,12 +1,18 @@
-const CACHE_NAME = 'someday-cache-v1';
+const CACHE_NAME = 'someday-cache-v2'; // 버전을 올려 기존 캐시 무효화
 
-// 설치 단계에서 대기하지 않고 즉시 활성화 (속도 최적화)
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
+  event.waitUntil(clients.claim().then(() => {
+    // 이전 버전의 캐시 삭제
+    return caches.keys().then((keys) => {
+      return Promise.all(keys.map((key) => {
+        if (key !== CACHE_NAME) return caches.delete(key);
+      }));
+    });
+  }));
 });
 
 self.addEventListener('fetch', (event) => {
