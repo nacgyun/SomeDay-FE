@@ -3,28 +3,33 @@ import type { Mission } from '../../../types';
 interface MissionItemProps {
   mission: Mission;
   onToggle?: (id: number) => void;
+  disabled?: boolean;
 }
 
-const MissionItem = ({ mission, onToggle }: MissionItemProps) => {
+const MissionItem = ({ mission, onToggle, disabled }: MissionItemProps) => {
   return (
     <div
       className={[
         'flex items-center gap-3 bg-white border border-slate-100 shadow-sm',
         'rounded-2xl px-4 py-4 transition-opacity duration-200',
         mission.done ? 'opacity-60 bg-slate-50' : 'opacity-100',
+        disabled ? 'opacity-50 grayscale-[0.3]' : '',
       ].join(' ')}
     >
       {/* 체크 버튼 */}
       <button
         id={`mission-check-${mission.id}`}
-        onClick={() => !mission.done && onToggle?.(mission.id)}
+        onClick={() => !mission.done && !disabled && onToggle?.(mission.id)}
+        disabled={disabled}
         className={[
           'w-[26px] h-[26px] rounded-full border-2 flex-shrink-0',
           'flex items-center justify-center text-sm font-bold',
           'transition-all duration-200',
           mission.done
             ? 'bg-brand-green border-brand-green text-white cursor-default'
-            : 'bg-transparent border-slate-200 text-transparent cursor-pointer hover:bg-slate-50',
+            : disabled
+              ? 'bg-slate-100 border-slate-200 text-transparent cursor-not-allowed'
+              : 'bg-transparent border-slate-200 text-transparent cursor-pointer hover:bg-slate-50',
         ].join(' ')}
       >
         {mission.done ? '✓' : ''}
