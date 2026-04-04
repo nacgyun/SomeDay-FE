@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,6 +8,24 @@ import JengaTower3D from '../components/features/main/JengaTower3D';
 import DiaryModal from '../components/features/main/DiaryModal';
 
 type ModalMode = 'diary' | 'survey';
+
+const STABLE_MESSAGES = [
+  '생글생글 웃고 있는',
+  '반짝반짝 빛나고 있는',
+  '포근하게 안착한',
+  '튼튼하고 씩씩한',
+  '기분 좋게 쌓여있는',
+  '마음이 단단해진'
+];
+
+const UNSTABLE_MESSAGES = [
+  '휴... 기운 없는',
+  '조금은 지쳐 보이는',
+  '위로가 필요한',
+  '토닥임이 간절한',
+  '잠시 쉬어가고 싶은',
+  '마음이 흔들리는'
+];
 
 const MainPage = () => {
   const { user } = useAuth();
@@ -29,6 +47,12 @@ const MainPage = () => {
   const score = tower?.stability_score ?? 100; // 타워가 없을 때는 100%로 시작 유도
   const isStable = !tower || score >= 60;
   const userName = user?.nickname || user?.name || '사용자';
+
+  // 💡 상태별 랜덤 메시지 선택
+  const towerStatusMessage = useMemo(() => {
+    const list = isStable ? STABLE_MESSAGES : UNSTABLE_MESSAGES;
+    return list[Math.floor(Math.random() * list.length)];
+  }, [isStable]);
 
   // 💡 안정도가 30% 이하일 때 경고 팝업 로직 (세션당 1회 + 오늘 하루 보지 않기 체크)
   useEffect(() => {
@@ -97,7 +121,7 @@ const MainPage = () => {
         <div className="absolute top-0 left-0 right-0 z-10 p-5 pt-12 flex flex-col pointer-events-none">
           <div className="flex justify-between items-start mb-2">
             <h2 className="text-3xl font-cute font-bold text-[#4a3b32] leading-tight mb-4">
-              {isStable ? '생글생글 웃고있는' : '휴... 기운없는'}<br />
+              {towerStatusMessage}<br />
               {userName}님의 타워
             </h2>
             <button className="pointer-events-auto bg-transparent border-none cursor-pointer">
