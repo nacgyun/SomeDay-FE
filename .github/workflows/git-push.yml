@@ -17,7 +17,7 @@ jobs:
           node-version: 22 # 아까 설치한 LTS 버전과 맞춤
 
       - name: Install Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Project
         run: npm run build
