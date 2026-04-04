@@ -66,9 +66,10 @@ const MainPage = () => {
         {/* 상단 UI 오버레이 */}
         <div className="absolute top-0 left-0 right-0 z-10 p-5 pt-12 flex flex-col pointer-events-none">
           <div className="flex justify-between items-start mb-2">
-            <h1 className={`text-4xl font-extrabold tracking-tighter ${isStable ? 'text-brand-orange-dark' : 'text-slate-800'}`}>
-              D-10
-            </h1>
+            <h2 className={`text-[21px] font-bold leading-tight mb-4 ${isStable ? 'text-brand-orange-dark/80' : 'text-slate-700'}`}>
+              {isStable ? '생글생글 웃고있는' : '휴... 기운없는'}<br />
+              {userName}님의 타워
+            </h2>
             <button className="pointer-events-auto bg-transparent border-none cursor-pointer">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isStable ? '#f97316' : '#334155'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -77,16 +78,13 @@ const MainPage = () => {
             </button>
           </div>
 
-          <h2 className={`text-[21px] font-bold leading-tight mb-4 ${isStable ? 'text-brand-orange-dark/80' : 'text-slate-700'}`}>
-            {isStable ? '생글생글 웃고있는' : '휴... 기운없는'}<br />
-            {userName}님의 타워
-          </h2>
+          
 
-          <div className="flex gap-2">
+          {/* <div className="flex gap-2">
             <button className={`pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full ${isStable ? 'bg-white shadow-sm text-brand-orange-dark border border-brand-orange/20' : 'bg-slate-200 text-slate-700 backdrop-blur-md'} font-bold text-sm border-none cursor-pointer`}>
               📦 블록 쌓기
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* 측면 스트레스/안정도 인디케이터 (목업 참조) */}
