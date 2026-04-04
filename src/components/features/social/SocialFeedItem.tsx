@@ -175,28 +175,33 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
               <h3 className="text-xl font-extrabold text-slate-800 mb-2">따뜻한 마음 전하기</h3>
               <p className="text-sm text-slate-500 mb-6">{user.nickname}님에게 응원의 메시지를 남겨주세요.</p>
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <input
-                  autoFocus
-                  type="text"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="응원의 한마디를 적어보세요..."
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-slate-800 outline-none focus:border-brand-purple/50 transition-colors shadow-inner"
-                />
+              <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                <div className="relative group">
+                  <textarea
+                    autoFocus
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="응원의 한마디를 적어보세요..."
+                    rows={3}
+                    className="w-full bg-[#FDFCFB] border border-slate-200/60 rounded-[24px] px-6 py-5 text-slate-800 outline-none focus:ring-4 focus:ring-[#f97316]/10 focus:border-[#f97316]/20 transition-all shadow-sm placeholder:text-slate-300 font-medium resize-none text-[15px] leading-relaxed"
+                  />
+                  <div className="absolute right-5 bottom-4 opacity-0 group-focus-within:opacity-100 transition-opacity">
+                    <span className="text-[10px] font-bold text-slate-300 tracking-wider uppercase">Warm Message</span>
+                  </div>
+                </div>
                 <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => setShowComfortModal(false)}
-                    className="flex-1 py-4 rounded-xl font-bold text-slate-400 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer border-none"
+                    className="flex-1 py-4 rounded-2xl font-bold text-slate-400 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer border-none text-sm"
                   >
                     취소
                   </button>
                   <button
                     type="submit"
-                    className="flex-[2] py-4 rounded-xl font-bold text-white bg-gradient-to-r from-brand-purple to-brand-blue shadow-lg shadow-brand-purple/20 active:scale-95 transition-transform cursor-pointer border-none"
+                    className="flex-[2] py-4 rounded-2xl font-extrabold text-white bg-[#f97316] shadow-lg shadow-brand-orange-dark/20 active:scale-95 transition-all cursor-pointer border-none"
                   >
-                    보내기 💖
+                    토닥토닥
                   </button>
                 </div>
               </form>
