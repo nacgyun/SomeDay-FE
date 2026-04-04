@@ -42,7 +42,7 @@ const SignupPage = () => {
         try {
           const result = await response.json();
           msg = result.message || msg;
-        } catch { } // If JSON parse fails, fallback to default msg
+        } catch { /* empty */ } // If JSON parse fails, fallback to default msg
         setErrorMsg(msg);
         setIsLoading(false);
         return;

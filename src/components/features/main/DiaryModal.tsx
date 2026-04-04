@@ -1,11 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
-
-interface Message {
-  id: number;
-  role: 'ai' | 'user';
-  text: string;
-  timestamp: Date;
-}
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useChat } from '../../../hooks/useChat';
 
 interface DiaryModalProps {
   isOpen: boolean;
@@ -13,61 +8,46 @@ interface DiaryModalProps {
   mode: 'diary' | 'survey';
 }
 
-const AI_INTRO: Record<'diary' | 'survey', string> = {
-  diary: '안녕하세요 😊 오늘 하루 어떠셨나요? 편하게 이야기해 주세요. 여기서는 솔직하게 말해도 괜찮아요.',
-  survey: '안녕하세요! 오늘의 마음 상태를 체크해볼게요 🌿\n\n첫 번째 질문이에요: 오늘 하루 전반적인 기분은 어떤가요? (1~10점)',
-};
-
 const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { user } = useAuth(); //
+  const { messages, isLoading, startChat, sendMessage, resetChat } = useChat();
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  
   const msgEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 모달 열릴 때 AI 인트로 메시지 추가
+  // 모달 열릴 때 API를 통한 채팅 세션 시작
   useEffect(() => {
-    if (isOpen) {
-      setMessages([
-        { id: 1, role: 'ai', text: AI_INTRO[mode], timestamp: new Date() },
-      ]);
-      setInput('');
+    if (isOpen && user?.id) {
+      startChat(user.id); //
       setTimeout(() => inputRef.current?.focus(), 300);
+    } else if (!isOpen) {
+      resetChat();
+      if (input !== '') {
+        setInput('');
+      }
     }
-  }, [isOpen, mode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, user?.id, startChat, resetChat]);
 
-  // 메시지 추가 시 스크롤
+  // 메시지 추가 시 아래로 자동 스크롤
   useEffect(() => {
     msgEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
+  }, [messages, isLoading]);
 
-  const sendMessage = async () => {
+  // ─── 수정된 부분: sendMessage 호출 시 user.id 전달 ───
+  const handleSend = useCallback(async () => {
     const text = input.trim();
-    if (!text) return;
+    if (!text || !user?.id || isLoading) return;
 
-    const userMsg: Message = { id: Date.now(), role: 'user', text, timestamp: new Date() };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput('');
-    setIsTyping(true);
-
-    // AI 응답 시뮬레이션 (추후 실제 API 연동)
-    await new Promise((r) => setTimeout(r, 1200 + Math.random() * 800));
-    const aiResponses = [
-      '그런 감정을 느끼는 건 정말 자연스러운 일이에요. 조금 더 이야기해 주실 수 있나요? 🌙',
-      '오늘 많이 힘드셨겠어요. 그 이야기를 나눠줘서 감사해요 💙',
-      '그 상황에서는 누구나 지칠 수 있어요. 오늘 하루 수고했어요 ✨',
-      '흥미롭네요! 그때 어떤 감정이 제일 컸나요?',
-      '맞아요, 작은 것들이 쌓이면 생각보다 무거워지죠. 잘 알아차렸어요 🌿',
-    ];
-    const aiMsg: Message = {
-      id: Date.now() + 1,
-      role: 'ai',
-      text: aiResponses[Math.floor(Math.random() * aiResponses.length)],
-      timestamp: new Date(),
-    };
-    setIsTyping(false);
-    setMessages((prev) => [...prev, aiMsg]);
-  };
+    setInput(''); // 입력 필드 즉시 초기화 (Optimistic UI)
+    
+    /**
+     * 💡 변경됨: 훅의 정의에 따라 userId를 두 번째 인자로 넘겨줍니다.
+     * 이를 통해 /api/chat-sessions/{sessionId}/messages?userId=... 요청이 완성됩니다.
+     */
+    await sendMessage(text, user.id); //
+  }, [input, user?.id, isLoading, sendMessage]);
 
   if (!isOpen) return null;
 
@@ -100,7 +80,6 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
             </div>
           </div>
           <button
-            id="diary-modal-close-btn"
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors text-lg cursor-pointer border-none"
           >
@@ -109,13 +88,12 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
         </div>
 
         {/* 채팅 영역 */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3 no-scrollbar">
+        <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3 no-scrollbar bg-[#0f0f1e]">
           {messages.map((msg) => (
             <div
               key={msg.id}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              {/* AI 아바타 */}
               {msg.role === 'ai' && (
                 <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5">
                   🤖
@@ -135,8 +113,7 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
             </div>
           ))}
 
-          {/* AI 타이핑 인디케이터 */}
-          {isTyping && (
+          {isLoading && (
             <div className="flex justify-start">
               <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5">
                 🤖
@@ -160,21 +137,23 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
           <div className="flex items-center gap-2.5 bg-white border border-slate-200 shadow-inner rounded-2xl px-4 py-2.5">
             <input
               ref={inputRef}
-              id="diary-chat-input"
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                  handleSend();
+                }
+              }}
               placeholder="마음을 자유롭게 적어보세요..."
               className="flex-1 bg-transparent text-slate-800 text-[14px] outline-none placeholder:text-slate-400 font-sans"
             />
             <button
-              id="diary-send-btn"
-              onClick={sendMessage}
-              disabled={!input.trim() || isTyping}
+              onClick={handleSend}
+              disabled={!input.trim() || isLoading}
               className={[
                 'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 cursor-pointer border-none text-base',
-                input.trim() && !isTyping
+                input.trim() && !isLoading
                   ? 'bg-gradient-to-br from-brand-orange to-brand-orange-dark text-white shadow-[0_4px_12px_rgba(255,107,0,0.3)]'
                   : 'bg-slate-100 text-slate-400',
               ].join(' ')}

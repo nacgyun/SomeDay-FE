@@ -65,7 +65,7 @@ const LoginPage = () => {
   return (
     <AuthLayout>
       <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
-        <div className="flex flex-col gap-4 mb-2">
+        <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="flex flex-col gap-4 mb-2">
           <Input
             id="email"
             type="email"
@@ -81,13 +81,12 @@ const LoginPage = () => {
             placeholder="비밀번호를 입력하세요"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
           />
           {errorMsg && <p className="text-brand-red text-xs font-semibold px-1">{errorMsg}</p>}
-          <Button id="login-btn" fullWidth onClick={handleLogin} disabled={isLoading} className="mt-2 text-[15px] py-[14px]">
+          <Button id="login-btn" fullWidth type="submit" disabled={isLoading} className="mt-2 text-[15px] py-[14px]">
             {isLoading ? '로그인 중...' : '로그인'}
           </Button>
-        </div>
+        </form>
 
         {/* 구분선 */}
         <div className="flex items-center gap-3 text-slate-400 text-[13px] my-5 relative">
