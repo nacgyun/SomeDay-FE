@@ -15,24 +15,31 @@ export const useSocialFeed = () => {
   const [users, setUsers] = useState<SocialUser[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const queryClient = useQueryClient();
 
   const fetchNextUser = useCallback(async () => {
-    if (isLoading) return;
+    if (!hasMore || isLoading) return;
     setIsLoading(true);
     setIsError(false);
 
     try {
       // 💡 GET /api/jenga-towers/users/random 요청
-      // 본인의 타워는 나오지 않도록 excludeUserId 파라미터 추가
       const response = await api.get('/api/jenga-towers/users/random', {
         params: { excludeUserId: user?.id }
       });
+
+      // API 응답 상태 확인
+      if (response.data?.status === 'FAIL') {
+        setHasMore(false);
+        console.warn('더 이상 조회 가능한 타워가 없습니다. (FAIL)');
+        return;
+      }
+
       const towerData = response.data?.data;
 
       if (towerData) {
-        // 1. 타워 데이터를 React Query 캐시에 미리 저장 (useTowerData에서 즉시 사용 가능)
-        // 서버 응답의 stabilityScore 등을 useTowerData가 기대하는 포맷으로 캐싱
+        // 1. 타워 데이터를 React Query 캐시에 미리 저장
         queryClient.setQueryData(['tower', towerData.userId], towerData);
 
         // 2. 피드 목록에 표시할 유저 정보 생성
@@ -43,10 +50,10 @@ export const useSocialFeed = () => {
           comment: towerData.blocks?.[towerData.blocks.length - 1]?.message || '마음을 쌓고 있어요.',
         };
 
-        // 3. 기존 리스트에 추가 (중복 유저는 무시하거나 허용 가능)
+        // 3. 기존 리스트에 추가
         setUsers((prev) => [...prev, newUser]);
       } else {
-        // 데이터가 없는 경우도 예외 상황으로 인지할 수 있도록 처리 (옵션)
+        setHasMore(false);
         console.warn('더 이상 불러올 타워가 없습니다.');
       }
     } catch (error) {
@@ -55,7 +62,7 @@ export const useSocialFeed = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, queryClient, user?.id]);
+  }, [isLoading, hasMore, queryClient, user?.id]);
 
-  return { users, isLoading, isError, fetchNextUser };
+  return { users, isLoading, isError, hasMore, fetchNextUser };
 };
