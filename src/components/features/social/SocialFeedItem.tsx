@@ -9,6 +9,7 @@ import avatar2 from '../../../assets/2.png';
 import avatar3 from '../../../assets/3.png';
 import avatar4 from '../../../assets/4.png';
 import cheeIcon from '../../../assets/chee.png';
+import LoadingOverlay from '../../ui/LoadingOverlay';
 
 const avatarImages = [avatar1, avatar2, avatar3, avatar4];
 
@@ -44,10 +45,17 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
 
   return (
     <div className="relative w-full h-screen snap-center overflow-hidden snap-always flex-shrink-0 bg-[#F0ECE4]">
+      {/* 젠가 타워 로딩 오버레이 (현재 활성화된 카드만) */}
+      {isActive && (isLoading || !tower) && (
+        <LoadingOverlay message={`${user.nickname}님의 마음 타워를 세우는 중...`} />
+      )}
+
       {isRendered && (
         <div className={`absolute inset-0 z-0 transition-opacity duration-700 ${isActive ? 'opacity-100' : 'opacity-40'}`}>
-          {isLoading || !tower ? (
-            <div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-3 border-brand-purple/20 border-t-brand-purple rounded-full animate-spin" /></div>
+          {!tower ? (
+            <div className="flex items-center justify-center h-full">
+              {/* 타워 데이터가 아예 없을 때의 빈 공간 처리 */}
+            </div>
           ) : (
             <JengaTower3D tower={tower} blocks={blocks} />
           )}

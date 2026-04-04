@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import PageHeader from '../components/layout/PageHeader';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api/axios';
+import LoadingOverlay from '../components/ui/LoadingOverlay';
 
 const SocialPage = () => {
   const { user: currentUser } = useAuth();
@@ -12,6 +13,9 @@ const SocialPage = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
+
+  // 초기 데이터 로드 (로딩 오버레이 노출)
+  const isInitialLoading = users.length === 0 && isLoading;
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -74,6 +78,9 @@ const SocialPage = () => {
       <div className="absolute top-0 left-0 right-0 z-50 pointer-events-none">
         <PageHeader title="마음 둘러보기" gradientColor="purple" />
       </div>
+
+      {/* 초기 로딩 오버레이 */}
+      {isInitialLoading && <LoadingOverlay message="따뜻한 일상들을 불러오는 중입니다..." />}
 
       {/* 스크롤 영역 */}
       <div
