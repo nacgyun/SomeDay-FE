@@ -23,6 +23,19 @@ const MyRecordsPage = () => {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1; // 1-indexed for display
 
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [pickerYear, setPickerYear] = useState(year);
+
+  const openPicker = () => {
+    setPickerYear(year);
+    setIsPickerOpen(true);
+  };
+
+  const selectMonth = (m: number) => {
+    setCurrentDate(new Date(pickerYear, m - 1, 1));
+    setIsPickerOpen(false);
+  };
+
   const handlePrevMonth = () => {
     setCurrentDate(new Date(year, currentDate.getMonth() - 1, 1));
   };
@@ -65,27 +78,15 @@ const MyRecordsPage = () => {
             </svg>
           </button>
 
-          <div className="flex flex-col items-center relative">
-            <select
-              value={year}
-              onChange={(e) => setCurrentDate(new Date(parseInt(e.target.value), currentDate.getMonth(), 1))}
-              className="appearance-none bg-transparent text-[13px] text-white/60 font-medium mb-0.5 outline-none cursor-pointer text-center text-align-last-center"
-            >
-              {[2024, 2025, 2026, 2027].map(y => (
-                <option key={y} value={y} className="text-black">{y}년</option>
-              ))}
-            </select>
-
-            <select
-              value={month}
-              onChange={(e) => setCurrentDate(new Date(currentDate.getFullYear(), parseInt(e.target.value) - 1, 1))}
-              className="appearance-none bg-transparent text-xl font-bold text-brand-orange outline-none cursor-pointer text-center text-align-last-center drop-shadow-sm"
-            >
-              {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-                <option key={m} value={m} className="text-black">{m}월 ▼</option>
-              ))}
-            </select>
-          </div>
+          <button 
+            onClick={openPicker}
+            className="flex flex-col items-center group cursor-pointer transition-transform hover:scale-105"
+          >
+            <span className="text-[13px] text-white/60 font-medium mb-0.5 group-hover:text-white/80 transition-colors">{year}년</span>
+            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-orange to-brand-orange/70 group-hover:from-brand-orange group-hover:to-brand-orange transition-colors flex items-center gap-1">
+              {month}월 <span className="text-[10px] text-brand-orange mt-1">▼</span>
+            </span>
+          </button>
 
           <button onClick={handleNextMonth} className="w-10 h-10 flex items-center justify-center text-white/50 hover:text-white bg-white/5 hover:bg-white/10 rounded-full transition-colors cursor-pointer">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -158,6 +159,50 @@ const MyRecordsPage = () => {
             </div>
 
             <Button variant="ghost" fullWidth onClick={() => setSelectedRecordDate(null)} className="!py-3 border border-white/10 hover:bg-white/5">
+              닫기
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* 날짜 선택 모달 (Picker) */}
+      {isPickerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md px-5">
+          <div className="bg-surface-secondary border border-white/10 rounded-3xl w-full max-w-[320px] p-6 shadow-2xl flex flex-col gap-4 animate-fade-in-up">
+            
+            {/* 연도 조작 */}
+            <div className="flex items-center justify-between px-2 mb-2">
+              <button onClick={() => setPickerYear(y => y - 1)} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <span className="text-xl font-bold text-white">{pickerYear}년</span>
+              <button onClick={() => setPickerYear(y => y + 1)} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+
+            {/* 월 그리드 */}
+            <div className="grid grid-cols-4 gap-2 mb-2">
+              {Array.from({length: 12}, (_, i) => i + 1).map(m => {
+                const isSelected = pickerYear === year && m === month;
+                return (
+                  <button
+                    key={m}
+                    onClick={() => selectMonth(m)}
+                    className={[
+                      'py-3 rounded-2xl text-sm font-semibold transition-all duration-200 cursor-pointer',
+                      isSelected
+                        ? 'bg-gradient-to-br from-brand-orange to-brand-orange-dark shadow-[0_4px_12px_rgba(255,107,0,0.3)] text-white'
+                        : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white hover:scale-105'
+                    ].join(' ')}
+                  >
+                    {m}월
+                  </button>
+                );
+              })}
+            </div>
+            
+            <Button variant="ghost" fullWidth onClick={() => setIsPickerOpen(false)} className="border border-white/10 mt-2">
               닫기
             </Button>
           </div>

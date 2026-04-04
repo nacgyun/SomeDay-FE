@@ -47,3 +47,19 @@ export interface NavItem {
 }
 
 export type MissionCategory = '전체' | '운동' | '자기계발' | '건강' | '마음챙김' | '루틴';
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  nickname: string;
+  gender: string;
+  age: number;
+  badTime: string | null;
+}
+
+export interface ApiResponse<T> {
+  status: string;
+  message: string;
+  data: T;
+}

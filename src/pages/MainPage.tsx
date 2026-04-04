@@ -1,12 +1,8 @@
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 import JengaTower3D, { type TowerData, type BlockData } from '../components/features/main/JengaTower3D';
 import DiaryModal from '../components/features/main/DiaryModal';
-
-const USER = {
-  name: '민지',
-  avatar: '😊',
-};
 
 const TOWER: TowerData = {
   stability_score: 55, // 60 미만이면 배색이 어두워지고 흔들림
@@ -43,6 +39,7 @@ const BLOCKS = buildBlocks();
 type ModalMode = 'diary' | 'survey';
 
 const MainPage = () => {
+  const { user } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>('diary');
 
@@ -52,6 +49,7 @@ const MainPage = () => {
   };
 
   const isStable = TOWER.stability_score >= 60;
+  const userName = user?.nickname || user?.name || '사용자';
 
   // 안정도에 따른 배경색 클래스 (Framer 3D 타워 레이아웃용)
   const bgGradient = isStable
@@ -82,7 +80,7 @@ const MainPage = () => {
           
           <h2 className={`text-[21px] font-bold leading-tight mb-4 ${isStable ? 'text-brand-green-dark/80' : 'text-white/80'}`}>
             {isStable ? '생글생글 웃고있는' : '휴... 기운없는'}<br />
-            {USER.name}님의 타워
+            {userName}님의 타워
           </h2>
 
           <div className="flex gap-2">

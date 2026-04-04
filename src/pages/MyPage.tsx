@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import type { MenuItemType } from '../types';
 import PageHeader from '../components/layout/PageHeader';
 import ProfileCard from '../components/features/my/ProfileCard';
@@ -28,10 +29,11 @@ const WEEKLY_STRESS_DATA = [
 
 const MyPage = () => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
 
   const handleLogout = () => {
-    // TODO: 실제 로그아웃 로직
+    logout();
     navigate('/login');
   };
 
@@ -42,8 +44,8 @@ const MyPage = () => {
       {/* 프로필 카드 */}
       <section className="px-5 mb-4">
         <ProfileCard
-          name="사용자님"
-          email="user@someday.app"
+          name={user?.nickname || user?.name || '사용자님'}
+          email={user?.email || 'user@someday.app'}
           avatar="😊"
           onEdit={() => setIsAccountModalOpen(true)}
         />
