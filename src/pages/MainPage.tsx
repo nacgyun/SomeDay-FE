@@ -16,7 +16,9 @@ const MainPage = () => {
   const { search } = useLocation();
 
 
-  const { tower, blocks, isLoading, isError } = useTowerData(user?.id);
+  const { tower, blocks, isLoading, isError, refetch, isFetching } = useTowerData(user?.id);
+
+
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>('diary');
@@ -98,8 +100,9 @@ const MainPage = () => {
       <div className={`relative w-full h-screen overflow-hidden transition-colors duration-1000 bg-[#F0ECE4] ${bgGradient}`}>
 
         {tower && blocks && blocks.length > 0 ? (
-          <>
+          <div key={`tower-render-${tower.stability_score}-${blocks.length}`} className="contents">
             <JengaTower3D tower={tower} blocks={blocks} onBlockClick={(msg) => setBlockMessage(msg)} />
+
             {showBubble && (
               <div className="absolute top-[18%] inset-x-0 flex justify-center z-20 pointer-events-none">
                 <div 
@@ -115,7 +118,7 @@ const MainPage = () => {
                 </div>
               </div>
             )}
-          </>
+          </div>
         ) : (
           <div className="absolute inset-0 z-0 flex flex-col items-center justify-center px-8 text-center pointer-events-none">
             <div className="w-24 h-24 bg-white/40 rounded-full flex items-center justify-center text-4xl mb-6 shadow-sm backdrop-blur-sm border border-white/20">
@@ -137,7 +140,25 @@ const MainPage = () => {
               {userName}님의 타워
             </h2>
             <div className="flex items-center gap-3 pointer-events-auto bg-transparent">
+              {/* 새로고침 아이콘 */}
+              <button 
+                onClick={() => refetch()} 
+                className="bg-white/40 backdrop-blur-sm w-9 h-9 rounded-full flex items-center justify-center border border-white/20 cursor-pointer transition-all hover:bg-white/60 active:scale-90 shadow-sm"
+              >
+                <svg 
+                  className={isFetching ? 'animate-spin' : ''} 
+                  width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5a4a3a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                >
+                  <path d="M21 2v6h-6"></path>
+                  <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                  <path d="M3 22v-6h6"></path>
+                  <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                </svg>
+
+              </button>
+
               {/* 가이드 아이콘 */}
+
               <button 
                 onClick={() => navigate('/guide')} 
                 className="bg-white/40 backdrop-blur-sm w-9 h-9 rounded-full flex items-center justify-center border border-white/20 cursor-pointer transition-all hover:bg-white/60 active:scale-90 shadow-sm"

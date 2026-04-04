@@ -45,6 +45,8 @@ export interface UseTowerDataReturn {
   blocks: TransformedBlockData[];
   isLoading: boolean;
   isError: boolean;
+  isFetching: boolean;
+  refetch: () => any;
 }
 
 // ─── 물리 상수 및 헬퍼 함수 ──────────────────────────────────────
@@ -84,7 +86,7 @@ export const useTowerData = (userId: number | undefined): UseTowerDataReturn => 
     }
   };
 
-  const { data, isLoading, isError } = useQuery<ServerTowerData | null>({
+  const { data, isLoading, isError, refetch, isFetching } = useQuery<ServerTowerData | null>({
     queryKey: ['tower', userId],
     queryFn: fetchMyTower,
     enabled: !!userId,
@@ -120,6 +122,8 @@ export const useTowerData = (userId: number | undefined): UseTowerDataReturn => 
     blocks: transformedBlocks,
     isLoading,
     isError,
+    isFetching,
+    refetch,
   };
 };
 
