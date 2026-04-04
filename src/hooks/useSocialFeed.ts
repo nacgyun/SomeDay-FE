@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import api from '../api/axios';
+import { useAuth } from '../contexts/AuthContext';
 
 export interface SocialUser {
   id: number;
@@ -10,6 +11,7 @@ export interface SocialUser {
 }
 
 export const useSocialFeed = () => {
+  const { user } = useAuth();
   const [users, setUsers] = useState<SocialUser[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
@@ -20,7 +22,10 @@ export const useSocialFeed = () => {
 
     try {
       // 💡 GET /api/jenga-towers/users/random 요청
-      const response = await api.get('/api/jenga-towers/users/random');
+      // 본인의 타워는 나오지 않도록 excludeUserId 파라미터 추가
+      const response = await api.get('/api/jenga-towers/users/random', {
+        params: { excludeUserId: user?.id }
+      });
       const towerData = response.data?.data;
 
       if (towerData) {
@@ -44,7 +49,7 @@ export const useSocialFeed = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, queryClient]);
+  }, [isLoading, queryClient, user?.id]);
 
   return { users, isLoading, fetchNextUser };
 };
