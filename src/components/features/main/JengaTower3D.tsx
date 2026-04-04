@@ -21,6 +21,7 @@ export interface BlockData {
 interface JengaTower3DProps {
   tower: TowerData;
   blocks: BlockData[];
+  onBlockClick?: (message: string) => void;
 }
 
 // ─── 물리 상수 ────────────────────────────────────────────────
@@ -71,9 +72,10 @@ function calcCollapsedOffsets(floorIndex: number, positionIndex: number): {
 interface ShakerGroupProps {
   tower: TowerData;
   blocks: BlockData[];
+  onBlockClick?: (message: string) => void;
 }
 
-const ShakerGroup = ({ tower, blocks }: ShakerGroupProps) => {
+const ShakerGroup = ({ tower, blocks, onBlockClick }: ShakerGroupProps) => {
   const groupRef = useRef<Group>(null);
   const { stability_score, collapsed } = tower;
 
@@ -123,6 +125,8 @@ const ShakerGroup = ({ tower, blocks }: ShakerGroupProps) => {
             isCollapsed={collapsed}
             collapsedOffset={posOffset}
             collapsedRotation={rotOffset}
+            message={block.message}
+            onClick={onBlockClick}
           />
         );
       })}
@@ -131,7 +135,7 @@ const ShakerGroup = ({ tower, blocks }: ShakerGroupProps) => {
 };
 
 // ─── 렌더링 ──────────────────────────────────────────────────
-const JengaTower3D = ({ tower, blocks }: JengaTower3DProps) => {
+const JengaTower3D = ({ tower, blocks, onBlockClick }: JengaTower3DProps) => {
   const towerHeight = tower.total_floors * FLOOR_HEIGHT;
   const midHeight = towerHeight / 2;
   const cameraPos: [number, number, number] = [12, 18, 24]; // 타워가 버튼과 겹치지 않도록 더 멀리 쿼터뷰
@@ -175,7 +179,7 @@ const JengaTower3D = ({ tower, blocks }: JengaTower3DProps) => {
             {/* 전체 그룹: 화면 상단으로 타워를 올려 하단 UI 버튼을 절대 가리지 않게 물리적 이격 */}
             <group position={[0, -2, 0]}>
               <group rotation={tower.collapsed ? [0, 0, -0.3] : [0, 0, 0]}>
-                <ShakerGroup tower={tower} blocks={blocks} />
+                <ShakerGroup tower={tower} blocks={blocks} onBlockClick={onBlockClick} />
               </group>
               
               <ContactShadows

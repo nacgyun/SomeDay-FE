@@ -41,6 +41,8 @@ export interface JengaBlock3DProps {
   blockIndex: number;
   collapsedOffset?: [number, number, number];
   collapsedRotation?: [number, number, number];
+  message?: string;
+  onClick?: (message: string) => void;
 }
 
 const JengaBlock3D = ({
@@ -51,6 +53,8 @@ const JengaBlock3D = ({
   blockIndex,
   collapsedOffset = [0, 0, 0],
   collapsedRotation = [0, 0, 0],
+  message = '',
+  onClick,
 }: JengaBlock3DProps) => {
   
   const mat = BLOCK_MATERIAL[blockType.toUpperCase()] ?? 
@@ -108,7 +112,16 @@ const JengaBlock3D = ({
             }
       }
     >
-      <mesh castShadow receiveShadow>
+      <mesh 
+        castShadow 
+        receiveShadow
+        onClick={(e) => {
+          if (blockType.toUpperCase() === 'CHEER' && message && onClick) {
+            e.stopPropagation();
+            onClick(message);
+          }
+        }}
+      >
         <boxGeometry args={[3, 1, 1]} />
         <meshStandardMaterial 
           color={mat.color} 

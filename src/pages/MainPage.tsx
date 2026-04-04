@@ -23,6 +23,7 @@ const MainPage = () => {
   const [showWarning, setShowWarning] = useState(false);
   const hasShownWarning = useRef(false);
   const [showBubble, setShowBubble] = useState(false);
+  const [blockMessage, setBlockMessage] = useState<string | null>(null);
 
   // 젠가 블록이 다 떨어진 후 말풍선 표시
   useEffect(() => {
@@ -98,7 +99,7 @@ const MainPage = () => {
 
         {tower && blocks && blocks.length > 0 ? (
           <>
-            <JengaTower3D tower={tower} blocks={blocks} />
+            <JengaTower3D tower={tower} blocks={blocks} onBlockClick={(msg) => setBlockMessage(msg)} />
             {showBubble && (
               <div className="absolute top-[18%] inset-x-0 flex justify-center z-20 pointer-events-none">
                 <div 
@@ -215,6 +216,36 @@ const MainPage = () => {
                   <button onClick={handleHideToday} className="flex-1 py-3 rounded-2xl font-bold text-slate-400 bg-transparent hover:bg-slate-50 transition-colors cursor-pointer border-none text-[11px] underline underline-offset-4">오늘 하루 보지 않기</button>
                 </div>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* 블록 메시지 팝업 */}
+      <AnimatePresence>
+        {blockMessage && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center px-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setBlockMessage(null)}
+              className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="relative w-full max-w-[320px] bg-white rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center"
+            >
+              <div className="text-4xl mb-4">💌</div>
+              <p className="text-[16px] font-cute font-bold text-[#4a3b32] leading-relaxed">{blockMessage}</p>
+              <button
+                onClick={() => setBlockMessage(null)}
+                className="mt-6 px-8 py-3 rounded-2xl font-bold text-white bg-gradient-to-r from-[#8b5e3c] to-[#a8774d] active:scale-95 transition-transform cursor-pointer border-none"
+              >
+                닫기
+              </button>
             </motion.div>
           </div>
         )}
