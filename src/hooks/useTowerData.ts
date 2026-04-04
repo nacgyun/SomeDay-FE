@@ -68,25 +68,28 @@ const calcBlockTransform = (floorIndex: number, positionIndex: number): {
 
 export const useTowerData = (userId: number | undefined): UseTowerDataReturn => {
   
-  const fetchMyTower = async (): Promise<ServerTowerData> => {
-    // 💡 에러 처리는 React Query가 담당하도록 throw를 허용합니다.
-    const response = await api.get<ApiResponse<ServerTowerData>>(
-      `/api/jenga-towers/users/${userId}`
-    );
-    
-    if (!response.data?.data) {
-      throw new Error('데이터 형식이 올바르지 않습니다.');
+  const fetchMyTower = async (): Promise<ServerTowerData | null> => {
+    try {
+      const response = await api.get<ApiResponse<ServerTowerData>>(
+        `/api/jenga-towers/users/${userId}`
+      );
+      return response.data?.data ?? null;
+    } catch (error: any) {
+      // 💡 404 에러인 경우 타워가 없는 것이므로 null을 반환하여 온보딩 상태로 유도합니다.
+      if (error.response?.status === 404) {
+        return null;
+      }
+      // 그 외 (500, 네트워크 에러 등)는 React Query가 에러로 처리하도록 throw 합니다.
+      throw error;
     }
-    
-    return response.data.data;
   };
 
-  const { data, isLoading, isError } = useQuery<ServerTowerData>({
+  const { data, isLoading, isError } = useQuery<ServerTowerData | null>({
     queryKey: ['tower', userId],
     queryFn: fetchMyTower,
     enabled: !!userId,
     // 💡 이전 에러 로그(TS7006) 해결을 위해 타입을 명확히 지정합니다.
-    placeholderData: (prev: ServerTowerData | undefined) => prev,
+    placeholderData: (prev: ServerTowerData | null | undefined) => prev,
     staleTime: 1000 * 60 * 5,
   });
 

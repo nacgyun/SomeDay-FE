@@ -32,17 +32,18 @@ const MainPage = () => {
     );
   }
 
+  // 💡 이제 404 에러는 tower === null 로 처리되므로, isError는 실제 서버 오류인 경우에만 뜹니다.
   if (isError) {
     return (
       <div className="w-full h-screen bg-[#F0ECE4] flex flex-col items-center justify-center">
         <p className="text-brand-red text-sm font-semibold mb-2">데이터를 불러오는 데 실패했습니다.</p>
-        <button className="bg-slate-200 px-4 py-2 rounded-lg text-slate-700" onClick={() => window.location.reload()}>다시 시도</button>
+        <button className="bg-slate-200 px-4 py-2 rounded-lg text-slate-700 pointer-events-auto" onClick={() => window.location.reload()}>다시 시도</button>
       </div>
     );
   }
 
-  const score = tower?.stability_score ?? 0;
-  const isStable = score >= 60;
+  const score = tower?.stability_score ?? 100; // 타워가 없을 때는 100%로 시작 유도
+  const isStable = !tower || score >= 60;
 
   // 안정도에 따른 배경색 클래스
   const bgGradient = isStable
@@ -53,13 +54,20 @@ const MainPage = () => {
     <>
       <div className={`relative w-full h-screen overflow-hidden transition-colors duration-1000 bg-[#F0ECE4] ${bgGradient}`}>
 
-        {/* 3D 젠가 타워 배경 (Absolute로 전체 화면 점유) */}
+        {/* 3D 젠가 타워 또는 온보딩 가이드 */}
         {tower && blocks && blocks.length > 0 ? (
           <JengaTower3D tower={tower} blocks={blocks} />
         ) : (
-          <div className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-6xl mb-4">🧱</span>
-            <p className="text-slate-500 font-bold text-lg">첫 번째 마음 블록을 쌓아보세요!</p>
+          <div className="absolute inset-0 z-0 flex flex-col items-center justify-center px-8 text-center pointer-events-none">
+            <div className="w-24 h-24 bg-white/40 rounded-full flex items-center justify-center text-4xl mb-6 shadow-sm backdrop-blur-sm border border-white/20">
+              🧡
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">
+              반가워요, {userName}님!
+            </h3>
+            <p className="text-slate-500 text-[15px] leading-relaxed break-keep">
+              아직 쌓인 마음이 없네요.<br /> 오늘의 일기를 쓰고 나만의 튼튼한<br /> 마음 타워를 처음으로 만들어볼까요?
+            </p>
           </div>
         )}
 
@@ -82,31 +90,32 @@ const MainPage = () => {
 
           {/* <div className="flex gap-2">
             <button className={`pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full ${isStable ? 'bg-white shadow-sm text-brand-orange-dark border border-brand-orange/20' : 'bg-slate-200 text-slate-700 backdrop-blur-md'} font-bold text-sm border-none cursor-pointer`}>
-              📦 블록 쌓기
+              📦 {tower ? '블록 쌓기' : '첫 블록 기대 중'}
             </button>
           </div> */}
         </div>
 
-        {/* 측면 스트레스/안정도 인디케이터 (목업 참조) */}
-        <div className="absolute left-5 top-[55%] -translate-y-1/2 z-10 pointer-events-none flex flex-col items-center">
-          <div className="w-2.5 h-32 rounded-full overflow-hidden bg-slate-300/50 shadow-inner">
-            {/* Score 만큼 바의 높이를 채움. (예: 55%면 높이가 55%이며 아래에서부터 차오름) */}
-            <div
-              className={`w-full rounded-full transition-all duration-1000 ${isStable ? 'bg-brand-orange shadow-sm' : 'bg-slate-400'}`}
-              style={{ height: `${score}%`, marginTop: `${100 - score}%` }}
-            />
+        {/* 측면 스트레스/안정도 인디케이터 (타워가 있을 때만 강조) */}
+        {tower && (
+          <div className="absolute left-5 top-[55%] -translate-y-1/2 z-10 pointer-events-none flex flex-col items-center">
+            <div className="w-2.5 h-32 rounded-full overflow-hidden bg-slate-300/50 shadow-inner">
+              <div
+                className={`w-full rounded-full transition-all duration-1000 ${isStable ? 'bg-brand-orange shadow-sm' : 'bg-slate-400'}`}
+                style={{ height: `${score}%`, marginTop: `${100 - score}%` }}
+              />
+            </div>
+            <div className="mt-2 text-center">
+              <p className="text-[12px] font-extrabold text-slate-800">
+                {score}%
+              </p>
+              <p className="text-[10px] font-bold text-slate-500">
+                안정도
+              </p>
+            </div>
           </div>
-          <div className="mt-2 text-center">
-            <p className="text-[12px] font-extrabold text-slate-800">
-              {score}%
-            </p>
-            <p className="text-[10px] font-bold text-slate-500">
-              안정도
-            </p>
-          </div>
-        </div>
+        )}
 
-        {/* 하단 일기 버튼 */}
+        {/* 하단 일기 버튼 (타워 유무 상관없이 항상 노출되어 대화 유도) */}
         <div className="absolute bottom-[90px] left-0 right-0 z-50 flex justify-center pointer-events-none">
           <button
             onClick={() => openModal('diary')}
