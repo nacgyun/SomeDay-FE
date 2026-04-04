@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
+import SignupPage from '../pages/SignupPage';
 import MainPage from '../pages/MainPage';
 import SocialPage from '../pages/SocialPage';
 import MissionPage from '../pages/MissionPage';
@@ -12,8 +13,9 @@ const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 로그인 */}
+        {/* 로그인 및 회원가입 */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
         {/* 네비 없는 독립 페이지들 */}
         <Route path="/my/records" element={<MyRecordsPage />} />
