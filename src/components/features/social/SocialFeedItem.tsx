@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import JengaTower3D from '../main/JengaTower3D';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTowerData } from '../../../hooks/useTowerData';
@@ -28,6 +28,18 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
 
   const { tower, blocks, isLoading } = useTowerData(user.id);
   const stabilityScore = tower?.stability_score ?? 100;
+  const isStable = stabilityScore >= 60;
+  const [showBubble, setShowBubble] = useState(false);
+
+  // 젠가 블록이 다 떨어진 후 말풍선 표시
+  useEffect(() => {
+    if (isActive && blocks && blocks.length > 0) {
+      setShowBubble(false);
+      const delay = blocks.length * 80 + 500;
+      const timer = setTimeout(() => setShowBubble(true), delay);
+      return () => clearTimeout(timer);
+    }
+  }, [isActive, blocks]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +81,38 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
           ) : (
             <JengaTower3D tower={tower} blocks={blocks} />
           )}
+        </div>
+      )}
+
+      {/* 말풍선 - 젠가 떨어진 후 등장 */}
+      {isActive && showBubble && tower && (
+        <div className="absolute top-[25%] inset-x-0 flex justify-center z-20 pointer-events-none">
+          <div 
+            className="relative bg-white/90 backdrop-blur-sm rounded-3xl px-8 py-5 shadow-lg border border-slate-100"
+            style={{
+              animation: 'dropIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, bubbleFloat 4s ease-in-out 1.2s infinite',
+            }}
+          >
+            <p className="text-[15px] font-cute font-bold text-[#5a4a3a] text-center">
+              {(() => {
+                const stableMessages = [
+                  '탄탄한 마음 타워네요 ✨',
+                  '오늘도 잘 버티고 있어요 💪',
+                  '마음이 단단하네요 🏗️',
+                  '든든한 하루를 보내고 있군요 🌟',
+                ];
+                const unstableMessages = [
+                  <>마음이 흔들리고 있어요...<br/>토닥토닥 해주세요 🍀</>,
+                  <>조금 힘든 하루인가 봐요<br/>응원 한마디 어때요? 💌</>,
+                  <>타워가 위태위태해요...<br/>따뜻한 말 한마디 부탁해요 🫶</>,
+                  <>마음이 무거운 날이네요<br/>힘내라고 말해주세요 🌈</>,
+                ];
+                const msgs = isStable ? stableMessages : unstableMessages;
+                return msgs[user.id % msgs.length];
+              })()}
+            </p>
+            <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-white/90 border-r border-b border-slate-100 rotate-45" />
+          </div>
         </div>
       )}
 
