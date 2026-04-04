@@ -1,16 +1,18 @@
-import type { FC } from 'react';
+import type { FC, ReactNode } from 'react';
+import { JengaIcon } from '../../icons/JengaIcon';
+import { FlameIcon, MailIcon, HeartIcon } from '../../icons/AppIcons';
 
 interface StatItemProps {
   title: string;
   value: number | string;
   unit: string;
-  icon: string;
+  icon: ReactNode;
   colorClass: string;
 }
 
 const StatItem: FC<StatItemProps> = ({ title, value, unit, icon, colorClass }) => (
-  <div className="bg-white border border-slate-100 shadow-sm rounded-[20px] p-4 flex flex-col items-center justify-center gap-1.5 transition-colors hover:bg-slate-50">
-    <div className={`text-2xl mb-1 ${colorClass} opacity-90 drop-shadow-sm`}>
+  <div className="bg-white border border-slate-100 shadow-sm rounded-[20px] p-4 flex flex-col items-center justify-center gap-1.5 transition-all hover:bg-slate-50 hover:shadow-md group">
+    <div className={`text-2xl mb-1 ${colorClass} opacity-90 transition-transform group-hover:scale-110 flex items-center justify-center min-h-[32px] w-full`}>
       {icon}
     </div>
     <div className="flex items-baseline gap-0.5">
@@ -40,28 +42,28 @@ const MyStats: FC<MyStatsProps> = ({
         title="연속 기록"
         value={consecutiveDays}
         unit="일"
-        icon="🔥"
+        icon={<FlameIcon className="w-9 h-9" />}
         colorClass="text-brand-orange"
       />
       <StatItem
         title="누적 타워"
         value={towerFloors}
         unit="층"
-        icon="🏢"
-        colorClass="text-brand-purple"
+        icon={<JengaIcon color="currentColor" className="w-7 h-7" />}
+        colorClass="text-[#B6754C]"
       />
       <StatItem
         title="받은 응원"
         value={receivedCheers}
         unit="회"
-        icon="💌"
+        icon={<MailIcon className="w-7 h-7" />}
         colorClass="text-pink-400"
       />
       <StatItem
         title="보낸 위로"
         value={sentConsoles}
         unit="회"
-        icon="🤝"
+        icon={<HeartIcon className="w-7 h-7" />}
         colorClass="text-brand-green"
       />
     </div>
