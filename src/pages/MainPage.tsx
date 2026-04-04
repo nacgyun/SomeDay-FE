@@ -112,10 +112,10 @@ const MainPage = () => {
         </div>
 
         {/* 하단 CTA (일기/설문 작성) - BottomNav 위쪽 */}
-        <div className="absolute bottom-[24px] left-0 right-0 z-40 px-5 pointer-events-none">
+        <div className="absolute bottom-[90px] left-0 right-0 z-50 flex justify-center pointer-events-none">
           <button
             onClick={() => openModal('diary')}
-            className={`pointer-events-auto w-full flex items-center justify-center gap-2.5 py-[18px] rounded-[18px] font-bold text-[16px] border-none shadow-[0_4px_20px_rgba(0,0,0,0.25)] transition-transform hover:-translate-y-0.5 active:translate-y-0 bg-gradient-to-r from-[#8b5e3c] to-[#a8774d] text-white`}
+            className="pointer-events-auto w-[90%] max-w-[400px] flex items-center justify-center gap-2.5 py-4 rounded-xl font-bold text-[16px] border-none shadow-[0_4px_20px_rgba(0,0,0,0.25)] transition-transform hover:-translate-y-0.5 active:translate-y-0 bg-gradient-to-r from-[#8b5e3c] to-[#a8774d] text-white"
           >
             <span className="text-[18px]">✏️</span>
             오늘 일기 · 마음 살펴보기

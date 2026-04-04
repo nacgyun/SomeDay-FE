@@ -134,17 +134,17 @@ const ShakerGroup = ({ tower, blocks }: ShakerGroupProps) => {
 const JengaTower3D = ({ tower, blocks }: JengaTower3DProps) => {
   const towerHeight = tower.total_floors * FLOOR_HEIGHT;
   const midHeight = towerHeight / 2;
-  const cameraPos: [number, number, number] = [8, 12, 18]; // 줌 아웃된 Isometric-like 쿼터뷰
+  const cameraPos: [number, number, number] = [12, 18, 24]; // 타워가 버튼과 겹치지 않도록 더 멀리 쿼터뷰
 
   return (
     <div className="w-full h-full absolute inset-0 z-0 pointer-events-auto flex items-center justify-center">
       <Canvas
         shadows
-        camera={{ position: cameraPos, fov: 42, near: 0.1, far: 120 }}
+        camera={{ position: cameraPos, fov: 48, near: 0.1, far: 120 }}
         gl={{ antialias: true, alpha: true }}
         onCreated={({ camera }) => {
-          // 타워의 물리적 중앙(y=6 근처)을 바라보게 해 화면 중앙에 타워 전체가 오도록 균형 조절
-          camera.lookAt(0, 6, 0); 
+          // 타워가 위로 올라간 만큼, 카메라도 중심점을 올려다보도록 타겟 조정
+          camera.lookAt(0, 4, 0); 
         }}
       >
         <Suspense fallback={null}>
@@ -158,8 +158,8 @@ const JengaTower3D = ({ tower, blocks }: JengaTower3DProps) => {
           />
           <pointLight position={[-8, midHeight, -8]} intensity={0.5} color="#b2c0cc" />
 
-          {/* 투명한 바닥 받침 - 위치도 함께 내림 (-5.15) */}
-          <mesh position={[0, -5.15, 0]} receiveShadow>
+          {/* 투명한 바닥 받침 - 위치 상향 조정 */}
+          <mesh position={[0, -2.15, 0]} receiveShadow>
             <cylinderGeometry args={[4.5, 4.5, 0.3, 32]} />
             <meshStandardMaterial color="#ffffff" transparent opacity={0.05} depthWrite={false} />
           </mesh>
@@ -172,8 +172,8 @@ const JengaTower3D = ({ tower, blocks }: JengaTower3DProps) => {
             polar={[-0.05, 0.05]}   // 상하 회전 매우 미세하게 한정적 허용
             azimuth={[-Math.PI / 1.1, Math.PI / 1.1]} // 좌우 거의 360도 수준으로 크게 허용
           >
-            {/* 전체 그룹: 화면 아래쪽으로 내려 하단 버튼과 마찰이 없게 여백 확보 */}
-            <group position={[0, -5, 0]}>
+            {/* 전체 그룹: 화면 상단으로 타워를 올려 하단 UI 버튼을 절대 가리지 않게 물리적 이격 */}
+            <group position={[0, -2, 0]}>
               <group rotation={tower.collapsed ? [0, 0, -0.3] : [0, 0, 0]}>
                 <ShakerGroup tower={tower} blocks={blocks} />
               </group>
