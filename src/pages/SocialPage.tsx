@@ -19,8 +19,10 @@ const SocialPage = () => {
 
   // 초기 데이터 로드
   useEffect(() => {
-    if (users.length === 0 && !isError && hasMore) fetchNextUser();
-  }, [fetchNextUser, users.length, isError, hasMore]);
+    if (users.length < 2 && !isLoading && !isError && hasMore) {
+      fetchNextUser();
+    }
+  }, [fetchNextUser, users.length, isError, hasMore, isLoading]);
 
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return;
@@ -30,8 +32,9 @@ const SocialPage = () => {
     if (index !== activeIndex && index >= 0 && index < users.length) {
       setActiveIndex(index);
       
-      // 💡 마지막 아이템에 도달하면 다음 랜덤 유저를 하나 더 불러옴
-      if (index === users.length - 1 && !isLoading && !isError && hasMore) {
+      // 💡 현재 뷰(index)가 로드된 마지막이거나 근처일 때 미리 다음 데이터를 불러옴
+      // (항상 최소 한 개의 다음 아이템이 있어야 원활한 스크롤이 가능)
+      if (index >= users.length - 1 && !isLoading && !isError && hasMore) {
         fetchNextUser();
       }
     }
