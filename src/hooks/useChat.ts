@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '../contexts/AuthContext';
 import api from '../api/axios';
 
 // ─── 타입 정의 ───────────────────────────────────────────────
@@ -34,6 +35,7 @@ interface UseChatReturn {
 
 export const useChat = (): UseChatReturn => {
   const queryClient = useQueryClient();
+  const { refreshProfile } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -128,6 +130,10 @@ export const useChat = (): UseChatReturn => {
           
           // 전역 타워 데이터 무효화 -> 자동 최신화
           queryClient.invalidateQueries({ queryKey: ['tower', userId] });
+          
+          // 💡 프로필 데이터도 최신화 (순서/계층 정보 반영)
+          await refreshProfile();
+          
           // 분석 결과 도출 후 최종 결과창 진입
           setAnalysisResult(data.analysisResponse);
         } catch (towerError: any) {

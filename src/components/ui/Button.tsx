@@ -16,9 +16,9 @@ const variantStyles: Record<Variant, string> = {
   google:
     'bg-white/[0.08] border border-white/[0.15] text-white hover:bg-white/[0.13] hover:-translate-y-0.5',
   ghost:
-    'bg-white/[0.06] border border-white/10 text-white/65 hover:bg-white/[0.12] hover:text-white',
+    'bg-slate-100/60 border border-slate-200 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900',
   green:
-    'bg-gradient-to-br from-brand-green to-brand-green-dark text-white shadow-[0_4px_16px_rgba(52,211,153,0.35)] hover:-translate-y-0.5',
+    'bg-[#B6754C] text-white shadow-sm hover:bg-[#a06642] active:scale-95',
   danger:
     'bg-red-500/10 border border-red-500/25 text-brand-red hover:bg-red-500/[0.18]',
 };
