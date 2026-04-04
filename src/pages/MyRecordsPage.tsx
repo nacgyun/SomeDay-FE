@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import PageHeader from '../components/layout/PageHeader';
 import Button from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
@@ -34,46 +35,37 @@ const MyRecordsPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
   const [selectedRecordDate, setSelectedRecordDate] = useState<string | null>(null);
 
-  const [records, setRecords] = useState<Record<string, RecordDetail>>({});
-  const [isLoading, setIsLoading] = useState(false);
-
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1; // 1-indexed for display
 
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [pickerYear, setPickerYear] = useState(year);
+  const [pickerYear, setPickerYear] = useState<number>(year);
 
-  const fetchMonthlySummaries = useCallback(async () => {
-    if (!user?.id) return;
-
-    setIsLoading(true);
-    try {
+  // TanStack Query를 이용한 데이터 페칭 및 캐싱
+  const { data: records = {}, isLoading, isFetching } = useQuery({
+    queryKey: ['monthlySummaries', user?.id, year, month],
+    queryFn: async () => {
+      if (!user?.id) return {};
       const response = await api.get(`/api/mental-analyses/${user.id}/monthly-summaries`, {
         params: { year, month }
       });
-
-      if (response.data) {
-        const mappedRecords: Record<string, RecordDetail> = {};
+      
+      const mappedRecords: Record<string, RecordDetail> = {};
+      if (response.data && Array.isArray(response.data)) {
         response.data.forEach((item: MonthlySummary) => {
           mappedRecords[item.analysisDate] = {
             content: item.mentalState,
             emotion: getEmotionByScore(item.stabilityScore),
-            stress: item.stabilityScore // UI에서는 stress로 쓰이지만 안정도 수치로 표시함
+            stress: item.stabilityScore
           };
         });
-        setRecords(mappedRecords);
       }
-    } catch (error) {
-      console.error('Failed to fetch monthly summaries:', error);
-      setRecords({});
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user?.id, year, month]);
-
-  useEffect(() => {
-    fetchMonthlySummaries();
-  }, [fetchMonthlySummaries]);
+      return mappedRecords;
+    },
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // 5분 동안은 신선한 데이터로 간주 (캐시 활용)
+    placeholderData: (prev) => prev, // 달 이동 시 이전 데이터를 잠시 유지해 깜빡임 방지
+  });
 
   const openPicker = () => {
     setPickerYear(year);
@@ -154,7 +146,7 @@ const MyRecordsPage = () => {
         </div>
 
         {/* 달력 그리드 */}
-        <div className={`grid grid-cols-7 gap-y-4 gap-x-2 transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
+        <div className={`grid grid-cols-7 gap-y-4 gap-x-2 transition-opacity duration-300 ${isLoading || isFetching ? 'opacity-50' : 'opacity-100'}`}>
           {days.map((day, idx) => {
             if (day === null) {
               return <div key={`empty-${idx}`} />;
