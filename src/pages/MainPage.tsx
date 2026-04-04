@@ -95,20 +95,35 @@ const MainPage = () => {
           </div> */}
         </div>
 
-        {/* 측면 스트레스/안정도 인디케이터 (타워가 있을 때만 강조) */}
+        {/* 측면 스트레스/안정도 인디케이터 */}
         {tower && (
           <div className="absolute left-5 top-[55%] -translate-y-1/2 z-10 pointer-events-none flex flex-col items-center">
-            <div className="w-2.5 h-32 rounded-full overflow-hidden bg-slate-300/50 shadow-inner">
+            <div className="w-10 h-80 rounded-full overflow-visible bg-slate-300/50 shadow-inner relative flex flex-col justify-end">
               <div
-                className={`w-full rounded-full transition-all duration-1000 ${isStable ? 'bg-brand-orange shadow-sm' : 'bg-slate-400'}`}
-                style={{ height: `${score}%`, marginTop: `${100 - score}%` }}
+                className={`w-full rounded-full transition-all duration-1000 shadow-sm ${
+                  score <= 30 ? 'bg-red-500 animate-pulse' :
+                  score <= 60 ? 'bg-amber-400' :
+                  'bg-emerald-400'
+                }`}
+                style={{
+                  height: `${score}%`,
+                  filter: score <= 30
+                    ? 'drop-shadow(0 0 10px rgba(239,68,68,0.9))'
+                    : score <= 60
+                    ? 'drop-shadow(0 0 6px rgba(251,191,36,0.8))'
+                    : 'drop-shadow(0 0 6px rgba(52,211,153,0.8))',
+                }}
               />
             </div>
-            <div className="mt-2 text-center">
-              <p className="text-[12px] font-extrabold text-slate-800">
+            <div className="mt-3 text-center">
+              <p className={`text-[14px] font-extrabold ${
+                score <= 30 ? 'text-red-500' :
+                score <= 60 ? 'text-amber-500' :
+                'text-emerald-500'
+              }`}>
                 {score}%
               </p>
-              <p className="text-[10px] font-bold text-slate-500">
+              <p className="text-[11px] font-bold text-slate-400">
                 안정도
               </p>
             </div>

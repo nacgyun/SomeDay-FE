@@ -3,6 +3,14 @@ import JengaTower3D from '../main/JengaTower3D';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTowerData } from '../../../hooks/useTowerData';
 import type { SocialUser } from '../../../hooks/useSocialFeed';
+import todakIcon from '../../../assets/todak.png';
+import avatar1 from '../../../assets/1.png';
+import avatar2 from '../../../assets/2.png';
+import avatar3 from '../../../assets/3.png';
+import avatar4 from '../../../assets/4.png';
+import cheeIcon from '../../../assets/chee.png';
+
+const avatarImages = [avatar1, avatar2, avatar3, avatar4];
 
 interface SocialFeedItemProps {
   user: SocialUser;
@@ -16,11 +24,8 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
   const [message, setMessage] = useState('');
   const [particles, setParticles] = useState<{ id: number; x: number }[]>([]);
 
-  // 💡 useSocialFeed에서 setQueryData를 해두었으므로 로딩 없이 즉시 렌더링됨
   const { tower, blocks, isLoading } = useTowerData(user.id);
-
   const stabilityScore = tower?.stability_score ?? 100;
-  const isStable = stabilityScore >= 60;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +43,7 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
   };
 
   return (
-    <div className={`relative w-full h-screen snap-center overflow-hidden snap-always flex-shrink-0 bg-[#F0ECE4]`}>
+    <div className="relative w-full h-screen snap-center overflow-hidden snap-always flex-shrink-0 bg-[#F0ECE4]">
       {isRendered && (
         <div className={`absolute inset-0 z-0 transition-opacity duration-700 ${isActive ? 'opacity-100' : 'opacity-40'}`}>
           {isLoading || !tower ? (
@@ -50,41 +55,60 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
       )}
 
       {/* 유저 정보 */}
-      <div className="absolute top-[100px] left-6 z-20 pointer-events-none">
-        <div className="flex items-center gap-3">
-          <span className="text-4xl drop-shadow-md">{user.avatarEmoji}</span>
-          <div>
-            <h2 className="text-xl font-bold text-slate-800 drop-shadow-sm">{user.nickname}</h2>
-            <p className="text-sm text-slate-500 font-medium">{user.comment}</p>
+      <div className="absolute top-[120px] left-6 right-6 z-20 pointer-events-none drop-shadow-md">
+        <div className="flex items-center gap-4 mb-2">
+          <img src={avatarImages[user.id % avatarImages.length]} alt="아바타" className="w-12 h-12 rounded-full object-cover ring-[3px] ring-white shadow-md ml-2" />
+          <div className="flex flex-col gap-1">
+            <h2 className="text-xl font-bold text-slate-800 leading-tight">{user.nickname}님의 타워</h2>
+            <p className="text-sm text-slate-600 flex items-center">{user.comment}{user.id === 1 && <img src={cheeIcon} alt="chee" className="w-5 h-5 object-contain" />}</p>
           </div>
         </div>
       </div>
 
-      {/* 안정도 바 */}
-      <div className="absolute left-6 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2">
-        <div className="w-2 h-32 rounded-full bg-slate-300/50 shadow-inner overflow-hidden">
-          <motion.div
-            className={`w-full ${isStable ? 'bg-brand-purple' : 'bg-slate-400'}`}
-            initial={{ height: 0 }}
-            animate={{ height: `${stabilityScore}%` }}
-            transition={{ duration: 1, type: 'spring' }}
-            style={{ marginTop: 'auto' }}
+      {/* 안정도 인디케이터 */}
+      <div className="absolute left-6 top-[55%] -translate-y-1/2 z-10 pointer-events-none flex flex-col items-center">
+        <div className="w-10 h-80 rounded-full overflow-visible bg-slate-300/50 shadow-inner relative flex flex-col justify-end">
+          <div
+            className={`w-full rounded-full transition-all duration-1000 ${
+              stabilityScore <= 30 ? 'bg-red-500 animate-pulse' :
+              stabilityScore <= 60 ? 'bg-amber-400' :
+              'bg-emerald-400'
+            }`}
+            style={{
+              height: `${stabilityScore}%`,
+              filter: stabilityScore <= 30
+                ? 'drop-shadow(0 0 10px rgba(239,68,68,0.9))'
+                : stabilityScore <= 60
+                ? 'drop-shadow(0 0 6px rgba(251,191,36,0.8))'
+                : 'drop-shadow(0 0 6px rgba(52,211,153,0.8))',
+            }}
           />
         </div>
-        <span className="text-xs font-black text-slate-800">{stabilityScore}%</span>
+        <div className="mt-3 text-center">
+          <p className={`text-[14px] font-extrabold ${
+            stabilityScore <= 30 ? 'text-red-500' :
+            stabilityScore <= 60 ? 'text-amber-500' :
+            'text-emerald-500'
+          }`}>{stabilityScore}%</p>
+          <p className="text-[11px] font-bold text-slate-400">안정도</p>
+        </div>
       </div>
 
       {/* 토닥토닥 버튼 */}
-      <div className="absolute bottom-32 right-6 z-30">
-        <button onClick={() => setShowComfortModal(true)} className="flex flex-col items-center gap-2 group">
-          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border border-slate-100 shadow-xl group-active:scale-95 transition-transform">
-            <span className="text-3xl">💖</span>
+      <div className="absolute bottom-[110px] right-6 z-20">
+        <button
+          onClick={() => setShowComfortModal(true)}
+          className="flex flex-col items-center justify-center gap-1 group"
+        >
+          <div className="relative w-[60px] h-[60px] rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-active:scale-95 overflow-hidden">
+            <div className="absolute inset-0 rounded-full bg-[#d4edda] ring-2 ring-[#5a9e6f]/30" />
+            <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[conic-gradient(transparent_0deg,rgba(255,255,255,0.7)_60deg,transparent_120deg)] group-hover:animate-[border-shine_1.2s_linear_infinite]" />
+            <img src={todakIcon} alt="토닥토닥" className="w-9 h-9 object-contain relative z-10" />
           </div>
-          <span className="text-[12px] font-bold text-slate-500">토닥토닥</span>
+          <span className="text-[11px] font-bold text-[#5a9e6f] drop-shadow-sm">토닥토닥</span>
         </button>
       </div>
 
-      {/* 파티클 및 모달 생략 (동일) */}
       <AnimatePresence>
         {particles.map((p) => (
           <motion.div
@@ -95,7 +119,7 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
             className="absolute bottom-40 right-10 text-3xl z-50 pointer-events-none"
             style={{ x: p.x }}
           >
-            💖
+            <img src={todakIcon} alt="토닥토닥" className="w-10 h-10 object-contain" />
           </motion.div>
         ))}
 

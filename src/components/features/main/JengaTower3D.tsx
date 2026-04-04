@@ -148,15 +148,15 @@ const JengaTower3D = ({ tower, blocks }: JengaTower3DProps) => {
         }}
       >
         <Suspense fallback={null}>
-          <ambientLight intensity={0.65} color="#ffffff" />
+          <ambientLight intensity={0.8} color="#fff5e6" />
           <directionalLight
             position={[10, 20, 5]}
-            intensity={1.2}
+            intensity={1.0}
             castShadow
             shadow-mapSize={[1024, 1024]}
-            color="#fffbf5"
+            color="#fff0d6"
           />
-          <pointLight position={[-8, midHeight, -8]} intensity={0.5} color="#b2c0cc" />
+          <pointLight position={[-8, midHeight, -8]} intensity={0.4} color="#ffe0c0" />
 
           {/* 투명한 바닥 받침 - 위치 상향 조정 */}
           <mesh position={[0, -2.15, 0]} receiveShadow>

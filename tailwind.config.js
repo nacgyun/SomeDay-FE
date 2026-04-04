@@ -40,6 +40,8 @@ export default {
         'float-reverse': 'float 10s ease-in-out infinite reverse',
         pulse: 'pulse 2s ease-in-out infinite',
         'dot-appear': 'dotAppear 0.2s ease',
+        shine: 'shine 0.8s ease-in-out',
+        'border-shine': 'border-shine 1.2s linear infinite',
       },
       keyframes: {
         float: {
@@ -49,6 +51,14 @@ export default {
         dotAppear: {
           from: { transform: 'scale(0)', opacity: '0' },
           to: { transform: 'scale(1)', opacity: '1' },
+        },
+        shine: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        'border-shine': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
         },
       },
     },
