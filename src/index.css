@@ -46,4 +46,63 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* 젠가 로딩 애니메이션 */
+  @keyframes jenga-pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+  }
+
+  @keyframes jenga-stack {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  /* 하나하나 쌓이는 블록 애니메이션 */
+  @keyframes jenga-block-in {
+    0% { transform: translateY(-40px); opacity: 0; }
+    60% { transform: translateY(0); opacity: 1; transform: scaleY(0.9); }
+    80% { transform: scaleY(1.05); }
+    100% { transform: translateY(0); opacity: 1; transform: scaleY(1); }
+  }
+
+  /* 전체 타워 루프 애니메이션 (부드럽게 사라졌다 다시 시작) */
+  @keyframes tower-loop {
+    0%, 80% { opacity: 1; }
+    90%, 100% { opacity: 0; }
+  }
+
+  .animate-jenga-pulse {
+    animation: jenga-pulse 2s ease-in-out infinite;
+  }
+
+  .animate-fade-in-up {
+    animation: jenga-stack 0.5s ease-out forwards;
+  }
+
+  .animate-jenga-block {
+    animation: jenga-block-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    opacity: 0;
+  }
+
+  .animate-tower-loop {
+    animation: tower-loop 4s ease-in-out infinite;
+  }
+
+  /* 애니메이션 딜레이 유틸리티 */
+  .delay-1 { animation-delay: 0.2s; }
+  .delay-2 { animation-delay: 0.4s; }
+  .delay-3 { animation-delay: 0.6s; }
+  .delay-4 { animation-delay: 0.8s; }
+  .delay-5 { animation-delay: 1.0s; }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
+  }
 }

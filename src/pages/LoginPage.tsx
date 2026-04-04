@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../components/ui/Input';
 import { useAuth } from '../contexts/AuthContext';
 import AuthLayout from '../layouts/AuthLayout';
+import LoadingOverlay from '../components/ui/LoadingOverlay';
 import type { ApiResponse, User } from '../types';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -63,6 +64,7 @@ const LoginPage = () => {
 
   return (
     <AuthLayout>
+      {isLoading && <LoadingOverlay />}
       <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
         <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="flex flex-col gap-4 mb-2">
           <Input
