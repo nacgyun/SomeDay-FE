@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useTowerData } from '../hooks/useTowerData';
 import { JengaIcon } from '../components/icons/JengaIcon';
@@ -9,19 +11,43 @@ type ModalMode = 'diary' | 'survey';
 
 const MainPage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Custom hook을 통해 타워/블록 데이터 패치 (user.id 기반)
   const { tower, blocks, isLoading, isError } = useTowerData(user?.id);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>('diary');
+  const [showWarning, setShowWarning] = useState(false);
+  const hasShownWarning = useRef(false);
 
   const openModal = (mode: ModalMode) => {
     setModalMode(mode);
     setModalOpen(true);
   };
 
+  const score = tower?.stability_score ?? 100; // 타워가 없을 때는 100%로 시작 유도
+  const isStable = !tower || score >= 60;
   const userName = user?.nickname || user?.name || '사용자';
+
+  // 💡 안정도가 30% 이하일 때 경고 팝업 로직 (세션당 1회 + 오늘 하루 보지 않기 체크)
+  useEffect(() => {
+    const hideDay = localStorage.getItem('hideStabilityWarningDay');
+    const today = new Date().toDateString();
+
+    if (score <= 30 && !hasShownWarning.current && !isLoading && tower && hideDay !== today) {
+      const timer = setTimeout(() => {
+        setShowWarning(true);
+        hasShownWarning.current = true;
+      }, 1500); // 타워 애니메이션 후 자연스럽게 뜨도록 지연
+      return () => clearTimeout(timer);
+    }
+  }, [score, isLoading, tower]);
+
+  const handleHideToday = () => {
+    localStorage.setItem('hideStabilityWarningDay', new Date().toDateString());
+    setShowWarning(false);
+  };
 
   if (isLoading) {
     return (
@@ -32,7 +58,6 @@ const MainPage = () => {
     );
   }
 
-  // 💡 이제 404 에러는 tower === null 로 처리되므로, isError는 실제 서버 오류인 경우에만 뜹니다.
   if (isError) {
     return (
       <div className="w-full h-screen bg-[#F0ECE4] flex flex-col items-center justify-center">
@@ -41,9 +66,6 @@ const MainPage = () => {
       </div>
     );
   }
-
-  const score = tower?.stability_score ?? 100; // 타워가 없을 때는 100%로 시작 유도
-  const isStable = !tower || score >= 60;
 
   // 안정도에 따른 배경색 클래스
   const bgGradient = isStable
@@ -141,6 +163,61 @@ const MainPage = () => {
           </button>
         </div>
       </div>
+
+      {/* 💡 위험 상태 알림 팝업 */}
+      <AnimatePresence>
+        {showWarning && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center px-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowWarning(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative w-full max-w-[340px] bg-white rounded-[32px] p-8 shadow-2xl flex flex-col items-center text-center"
+            >
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-3xl mb-5 shadow-inner">
+                😟
+              </div>
+              <h3 className="text-xl font-extrabold text-slate-800 mb-3 break-keep">
+                요즘 많이 불안하신 거 같아요!
+              </h3>
+              <p className="text-[15px] text-slate-500 leading-relaxed mb-8 break-keep">
+                미션을 통해 여유를 찾고<br />
+                마음을 다시 쌓아보아요!
+              </p>
+              
+              <div className="flex flex-col w-full gap-3">
+                <button
+                  onClick={() => navigate('/mission')}
+                  className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-brand-orange to-brand-orange-dark shadow-lg shadow-brand-orange/20 active:scale-95 transition-transform cursor-pointer border-none"
+                >
+                  미션 하러 가기 🏃‍♂️
+                </button>
+                <div className="flex w-full gap-2 mt-1">
+                  <button
+                    onClick={() => setShowWarning(false)}
+                    className="flex-1 py-3 rounded-2xl font-bold text-slate-500 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer border-none text-sm"
+                  >
+                    확인
+                  </button>
+                  <button
+                    onClick={handleHideToday}
+                    className="flex-1 py-3 rounded-2xl font-bold text-slate-400 bg-transparent hover:bg-slate-50 transition-colors cursor-pointer border-none text-[11px] underline underline-offset-4"
+                  >
+                    오늘 하루 보지 않기
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <DiaryModal isOpen={modalOpen} onClose={() => setModalOpen(false)} mode={modalMode} />
     </>
