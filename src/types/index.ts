@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 // ─── 공통 타입 정의 ───────────────────────────────────────────
 
 export interface Post {
@@ -38,7 +40,7 @@ export interface ActivityItem {
 
 export interface MenuItemType {
   id: string;
-  icon: string;
+  icon: ReactNode;
   label: string;
 }
 

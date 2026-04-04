@@ -11,11 +11,13 @@ import MenuItem from '../components/features/my/MenuItem';
 import Button from '../components/ui/Button';
 import api from '../api/axios';
 
+import { HistoryIcon, MessageCircleIcon, FileTextIcon } from '../components/icons/AppIcons';
+
 // ─── 메뉴 항목 ──────────────────────────────────────────────
 const MENU_ITEMS: MenuItemType[] = [
-  { id: 'history', icon: '📊', label: '나의 기록' },
-  { id: 'inquiry', icon: '💬', label: '문의하기' },
-  { id: 'terms', icon: '📄', label: '이용약관' },
+  { id: 'history', icon: <HistoryIcon className="w-5 h-5" />, label: '나의 기록' },
+  { id: 'inquiry', icon: <MessageCircleIcon className="w-5 h-5" />, label: '문의하기' },
+  { id: 'terms', icon: <FileTextIcon className="w-5 h-5" />, label: '이용약관' },
 ];
 
 const getMyProfile = async (userId: number) => {
