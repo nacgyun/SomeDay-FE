@@ -5,16 +5,33 @@ import { Edges } from '@react-three/drei';
 
 const BLOCK_MATERIAL: Record<
   string,
-  { color: string; roughness: number }
+  { 
+    color: string; 
+    roughness: number; 
+    metalness?: number; 
+    emissive?: string; 
+    emissiveIntensity?: number;
+  }
 > = {
-  standard: { color: '#dcb38a', roughness: 0.9 }, // 밝은 나무색
-  stress:   { color: '#e07a5f', roughness: 0.8 }, // 뮤트된 코랄 오렌지
-  joy:      { color: '#f4f1de', roughness: 0.8 }, // 크림 베이지
-  anxiety:  { color: '#81b29a', roughness: 0.8 }, // 뮤트된 민트 그린
-  sadness:  { color: '#3d405b', roughness: 0.9 }, // 딥 네이비
-  anger:    { color: '#c1121f', roughness: 0.9 }, // 딥 레드
-  calm:     { color: '#eef4ed', roughness: 0.8 }, // 옅은 민트
-  fatigue:  { color: '#8d99ae', roughness: 0.9 }, // 슬레이트 그레이
+  // ─── 유저 명세 기반 타입 (대문자) ──────────────
+  STANDARD: { color: '#C4A484', roughness: 0.8 }, // 따뜻한 나무 느낌의 베이지
+  CHEER:    { 
+    color: '#FFD700', 
+    roughness: 0.2, 
+    metalness: 1.0, 
+    emissive: '#FF8000', 
+    emissiveIntensity: 0.8 
+  }, // 빛나는 응원 블록 (금속 광택 + 주황빛 발광)
+
+  // ─── 기존 소문자 타입 호환성 유지 ──────────────
+  standard: { color: '#C4A484', roughness: 0.8 },
+  stress:   { color: '#e07a5f', roughness: 0.8 },
+  joy:      { color: '#f4f1de', roughness: 0.8 },
+  anxiety:  { color: '#81b29a', roughness: 0.8 },
+  sadness:  { color: '#3d405b', roughness: 0.9 },
+  anger:    { color: '#c1121f', roughness: 0.9 },
+  calm:     { color: '#eef4ed', roughness: 0.8 },
+  fatigue:  { color: '#8d99ae', roughness: 0.9 },
 };
 
 export interface JengaBlock3DProps {
@@ -38,7 +55,11 @@ const JengaBlock3D = ({
   collapsedRotation = [0, 0, 0],
 }: JengaBlock3DProps) => {
   const meshRef = useRef<Mesh>(null);
-  const mat = BLOCK_MATERIAL[blockType] ?? BLOCK_MATERIAL.standard;
+  
+  // 대소문자 구분 없이 매핑하기 위해 대문자로 먼저 매칭 시도
+  const mat = BLOCK_MATERIAL[blockType.toUpperCase()] ?? 
+              BLOCK_MATERIAL[blockType] ?? 
+              BLOCK_MATERIAL.STANDARD;
 
   // Collapse 여부에 따라 최종 목적지 결정
   const targetPosition: [number, number, number] = isCollapsed
@@ -97,7 +118,13 @@ const JengaBlock3D = ({
       receiveShadow
     >
       <boxGeometry args={[3, 1, 1]} />
-      <meshToonMaterial color={mat.color} />
+      <meshStandardMaterial 
+        color={mat.color} 
+        roughness={mat.roughness}
+        metalness={mat.metalness ?? 0.1}
+        emissive={mat.emissive ?? '#000000'}
+        emissiveIntensity={mat.emissiveIntensity ?? 0}
+      />
       
       {/* 만화/일러스트 스타일용 얇은 외곽선 */}
       <Edges scale={1} threshold={15} color="#4a3b32" />

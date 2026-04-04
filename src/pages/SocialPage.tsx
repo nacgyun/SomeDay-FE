@@ -57,7 +57,7 @@ const SocialPage = () => {
             {
               floor_index: oldData.totalFloors || 0,
               position_index: Math.floor(Math.random() * 3),
-              block_type: 'gift',
+              block_type: 'CHEER',
               message,
             }
           ]
