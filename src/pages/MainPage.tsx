@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTowerData } from '../hooks/useTowerData';
-import { JengaIcon } from '../components/icons/JengaIcon';
+
 import JengaTower3D from '../components/features/main/JengaTower3D';
 import DiaryModal from '../components/features/main/DiaryModal';
 
@@ -9,7 +9,7 @@ type ModalMode = 'diary' | 'survey';
 
 const MainPage = () => {
   const { user } = useAuth();
-
+  
   // Custom hook을 통해 타워/블록 데이터 패치 (user.id 기반)
   const { tower, blocks, isLoading, isError } = useTowerData(user?.id);
 
@@ -78,7 +78,7 @@ const MainPage = () => {
             </button>
           </div>
 
-
+          
 
           {/* <div className="flex gap-2">
             <button className={`pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full ${isStable ? 'bg-white shadow-sm text-brand-orange-dark border border-brand-orange/20' : 'bg-slate-200 text-slate-700 backdrop-blur-md'} font-bold text-sm border-none cursor-pointer`}>
@@ -110,10 +110,10 @@ const MainPage = () => {
         <div className="absolute bottom-[90px] left-0 right-0 z-50 flex justify-center pointer-events-none">
           <button
             onClick={() => openModal('diary')}
-            className="pointer-events-auto w-[90%] max-w-[400px] flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-[16px] border-none shadow-[0_8px_25px_rgba(0,0,0,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-[#8b5e3c] to-[#a8774d] text-white cursor-pointer"
+            className="pointer-events-auto w-[90%] max-w-[400px] flex items-center justify-center gap-2.5 py-4 rounded-xl font-bold text-[16px] border-none shadow-[0_4px_20px_rgba(0,0,0,0.25)] transition-transform hover:-translate-y-0.5 active:translate-y-0 bg-gradient-to-r from-[#8b5e3c] to-[#a8774d] text-white cursor-pointer"
           >
-            <JengaIcon color="#b5b1afff" className="w-5 h-5" />
-            <span>AI와 젠가쌓기</span>
+            <span className="text-[18px]">✏️</span>
+            오늘 일기 · 마음 살펴보기
           </button>
         </div>
       </div>

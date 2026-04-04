@@ -19,8 +19,6 @@ export interface Mission {
   done: boolean;
   point: number;
   dayOffset?: number; // 0 = 6 days ago, ..., 6 = today
-  createdAt?: string; // 생성 시간
-  completed?: boolean; // 서버 완료 여부
 }
 
 export interface StatItem {
