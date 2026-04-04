@@ -41,7 +41,7 @@ const SocialPage = () => {
       await api.post('/api/cheer-messages', {
         senderId: currentUser.id,
         receiverId: userId,
-        cheerType: 0, // 기본 응원
+        cheerType: "CHEER", // 기본 응원
         message: message,
       });
 
