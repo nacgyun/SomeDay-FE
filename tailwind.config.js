@@ -43,6 +43,7 @@ export default {
         'dot-appear': 'dotAppear 0.2s ease',
         shine: 'shine 0.8s ease-in-out',
         'border-shine': 'border-shine 1.2s linear infinite',
+        fadeIn: 'fadeIn 0.5s ease-in-out',
       },
       keyframes: {
         float: {
@@ -60,6 +61,10 @@ export default {
         'border-shine': {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(-80px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
     },

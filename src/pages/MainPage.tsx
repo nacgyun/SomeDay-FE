@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -9,52 +9,36 @@ import DiaryModal from '../components/features/main/DiaryModal';
 
 type ModalMode = 'diary' | 'survey';
 
-const STABLE_MESSAGES = [
-  '생글생글 웃고 있는',
-  '반짝반짝 빛나고 있는',
-  '포근하게 안착한',
-  '튼튼하고 씩씩한',
-  '기분 좋게 쌓여있는',
-  '마음이 단단해진'
-];
-
-const UNSTABLE_MESSAGES = [
-  '휴... 기운 없는',
-  '조금은 지쳐 보이는',
-  '위로가 필요한',
-  '토닥임이 간절한',
-  '잠시 쉬어가고 싶은',
-  '마음이 흔들리는'
-];
-
 const MainPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Custom hook을 통해 타워/블록 데이터 패치 (user.id 기반)
   const { tower, blocks, isLoading, isError } = useTowerData(user?.id);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>('diary');
   const [showWarning, setShowWarning] = useState(false);
   const hasShownWarning = useRef(false);
+  const [showBubble, setShowBubble] = useState(false);
+
+  // 젠가 블록이 다 떨어진 후 말풍선 표시
+  useEffect(() => {
+    if (blocks && blocks.length > 0) {
+      const delay = blocks.length * 80 + 1500;
+      const timer = setTimeout(() => setShowBubble(true), delay);
+      return () => clearTimeout(timer);
+    }
+  }, [blocks]);
 
   const openModal = (mode: ModalMode) => {
     setModalMode(mode);
     setModalOpen(true);
   };
 
-  const score = tower?.stability_score ?? 100; // 타워가 없을 때는 100%로 시작 유도
+  const score = tower?.stability_score ?? 100;
   const isStable = !tower || score >= 60;
   const userName = user?.nickname || user?.name || '사용자';
 
-  // 💡 상태별 랜덤 메시지 선택
-  const towerStatusMessage = useMemo(() => {
-    const list = isStable ? STABLE_MESSAGES : UNSTABLE_MESSAGES;
-    return list[Math.floor(Math.random() * list.length)];
-  }, [isStable]);
-
-  // 💡 안정도가 30% 이하일 때 경고 팝업 로직 (세션당 1회 + 오늘 하루 보지 않기 체크)
   useEffect(() => {
     const hideDay = localStorage.getItem('hideStabilityWarningDay');
     const today = new Date().toDateString();
@@ -63,7 +47,7 @@ const MainPage = () => {
       const timer = setTimeout(() => {
         setShowWarning(true);
         hasShownWarning.current = true;
-      }, 1500); // 타워 애니메이션 후 자연스럽게 뜨도록 지연
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [score, isLoading, tower]);
@@ -91,7 +75,6 @@ const MainPage = () => {
     );
   }
 
-  // 안정도에 따른 배경색 클래스
   const bgGradient = isStable
     ? 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/60 via-transparent to-transparent'
     : 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent';
@@ -100,9 +83,25 @@ const MainPage = () => {
     <>
       <div className={`relative w-full h-screen overflow-hidden transition-colors duration-1000 bg-[#F0ECE4] ${bgGradient}`}>
 
-        {/* 3D 젠가 타워 또는 온보딩 가이드 */}
         {tower && blocks && blocks.length > 0 ? (
-          <JengaTower3D tower={tower} blocks={blocks} />
+          <>
+            <JengaTower3D tower={tower} blocks={blocks} />
+            {showBubble && (
+              <div className="absolute top-[18%] inset-x-0 flex justify-center z-20 pointer-events-none">
+                <div 
+                  className="relative bg-white/90 backdrop-blur-sm rounded-3xl px-10 py-6 shadow-lg border border-slate-100"
+                  style={{
+                    animation: 'dropIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, bubbleFloat 4s ease-in-out 1.2s infinite',
+                  }}
+                >
+                  <p className="text-[18px] font-cute font-bold text-[#5a4a3a] text-center">
+                    {isStable ? <>밤새 코딩했지만<br/>커피 한 잔이면 아직 버틸 수 있어요 ☕😎</> : <>무박 2일 해커톤...<br/>멘탈이랑 체력이 동시에 무너지는 중 😴</>}
+                  </p>
+                  <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-white/90 border-r border-b border-slate-100 rotate-45" />
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <div className="absolute inset-0 z-0 flex flex-col items-center justify-center px-8 text-center pointer-events-none">
             <div className="w-24 h-24 bg-white/40 rounded-full flex items-center justify-center text-4xl mb-6 shadow-sm backdrop-blur-sm border border-white/20">
@@ -117,11 +116,10 @@ const MainPage = () => {
           </div>
         )}
 
-        {/* 상단 UI 오버레이 */}
         <div className="absolute top-0 left-0 right-0 z-10 p-5 pt-12 flex flex-col pointer-events-none">
           <div className="flex justify-between items-start mb-2">
             <h2 className="text-3xl font-cute font-bold text-[#4a3b32] leading-tight mb-4">
-              {towerStatusMessage}<br />
+              {isStable ? '생글생글 웃고있는' : '휴... 기운없는'}<br />
               {userName}님의 타워
             </h2>
             <button className="pointer-events-auto bg-transparent border-none cursor-pointer">
@@ -131,17 +129,8 @@ const MainPage = () => {
               </svg>
             </button>
           </div>
-
-
-
-          {/* <div className="flex gap-2">
-            <button className={`pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full ${isStable ? 'bg-white shadow-sm text-brand-orange-dark border border-brand-orange/20' : 'bg-slate-200 text-slate-700 backdrop-blur-md'} font-bold text-sm border-none cursor-pointer`}>
-              📦 {tower ? '블록 쌓기' : '첫 블록 기대 중'}
-            </button>
-          </div> */}
         </div>
 
-        {/* 측면 스트레스/안정도 인디케이터 */}
         {tower && (
           <div className="absolute left-5 top-[55%] -translate-y-1/2 z-10 pointer-events-none flex flex-col items-center">
             <div className="w-10 h-80 rounded-full overflow-visible bg-slate-300/50 shadow-inner relative flex flex-col justify-end">
@@ -166,17 +155,12 @@ const MainPage = () => {
                 score <= 30 ? 'text-red-500' :
                 score <= 60 ? 'text-amber-500' :
                 'text-emerald-500'
-              }`}>
-                {score}%
-              </p>
-              <p className="text-[11px] font-bold text-slate-400">
-                안정도
-              </p>
+              }`}>{score}%</p>
+              <p className="text-[11px] font-bold text-slate-400">안정도</p>
             </div>
           </div>
         )}
 
-        {/* 하단 일기 버튼 (타워 유무 상관없이 항상 노출되어 대화 유도) */}
         <div className="absolute bottom-[110px] left-0 right-0 z-50 flex justify-center pointer-events-none">
           <button
             onClick={() => openModal('diary')}
@@ -188,54 +172,19 @@ const MainPage = () => {
         </div>
       </div>
 
-      {/* 💡 위험 상태 알림 팝업 */}
       <AnimatePresence>
         {showWarning && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center px-6">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowWarning(false)}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-[340px] bg-white rounded-[32px] p-8 shadow-2xl flex flex-col items-center text-center"
-            >
-              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-3xl mb-5 shadow-inner">
-                😟
-              </div>
-              <h3 className="text-xl font-extrabold text-slate-800 mb-3 break-keep">
-                요즘 많이 불안하신 거 같아요!
-              </h3>
-              <p className="text-[15px] text-slate-500 leading-relaxed mb-8 break-keep">
-                미션을 통해 여유를 찾고<br />
-                마음을 다시 쌓아보아요!
-              </p>
-              
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowWarning(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-[340px] bg-white rounded-[32px] p-8 shadow-2xl flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-3xl mb-5 shadow-inner">😟</div>
+              <h3 className="text-xl font-extrabold text-slate-800 mb-3 break-keep">요즘 많이 불안하신 거 같아요!</h3>
+              <p className="text-[15px] text-slate-500 leading-relaxed mb-8 break-keep">미션을 통해 여유를 찾고<br />마음을 다시 쌓아보아요!</p>
               <div className="flex flex-col w-full gap-3">
-                <button
-                  onClick={() => navigate('/mission')}
-                  className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-brand-orange to-brand-orange-dark shadow-lg shadow-brand-orange/20 active:scale-95 transition-transform cursor-pointer border-none"
-                >
-                  미션 하러 가기 🏃‍♂️
-                </button>
+                <button onClick={() => navigate('/mission')} className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-brand-orange to-brand-orange-dark shadow-lg shadow-brand-orange/20 active:scale-95 transition-transform cursor-pointer border-none">미션 하러 가기 🏃‍♂️</button>
                 <div className="flex w-full gap-2 mt-1">
-                  <button
-                    onClick={() => setShowWarning(false)}
-                    className="flex-1 py-3 rounded-2xl font-bold text-slate-500 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer border-none text-sm"
-                  >
-                    확인
-                  </button>
-                  <button
-                    onClick={handleHideToday}
-                    className="flex-1 py-3 rounded-2xl font-bold text-slate-400 bg-transparent hover:bg-slate-50 transition-colors cursor-pointer border-none text-[11px] underline underline-offset-4"
-                  >
-                    오늘 하루 보지 않기
-                  </button>
+                  <button onClick={() => setShowWarning(false)} className="flex-1 py-3 rounded-2xl font-bold text-slate-500 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer border-none text-sm">확인</button>
+                  <button onClick={handleHideToday} className="flex-1 py-3 rounded-2xl font-bold text-slate-400 bg-transparent hover:bg-slate-50 transition-colors cursor-pointer border-none text-[11px] underline underline-offset-4">오늘 하루 보지 않기</button>
                 </div>
               </div>
             </motion.div>
