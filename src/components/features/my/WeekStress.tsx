@@ -23,7 +23,7 @@ const WeekStress = ({ data }: WeekStressProps) => {
         <span className="text-xs text-brand-orange">최근 7일</span>
       </div>
 
-      <div className="flex items-end justify-between h-[120px] gap-2 mt-2">
+      <div className="flex items-end justify-between h-[120px] gap-1 mt-2 px-1">
         {data.map((item, index) => {
           const heightPercent = Math.max((item.level / maxLevel) * 100, 4); // 최소 높이 보장
           const colorInfo = getBarColorInfo(item.level);
@@ -32,7 +32,7 @@ const WeekStress = ({ data }: WeekStressProps) => {
           return (
             <div key={index} className="flex flex-col items-center gap-2 flex-1 group cursor-pointer">
               {/* 막대 컨테이너 */}
-              <div className="relative w-full flex justify-center items-end h-[100px] rounded-t-lg transition hover:bg-white/[0.02]">
+              <div className="relative w-full flex justify-center items-end h-[100px] transition hover:bg-white/[0.03] rounded-md">
                 {/* 호버 시 나타나는 수치 툴팁 */}
                 <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-surface-secondary text-[10px] font-bold rounded-md px-2 py-1 shadow-lg pointer-events-none border border-white/10 z-10 text-white">
                   {item.level}
@@ -40,7 +40,7 @@ const WeekStress = ({ data }: WeekStressProps) => {
 
                 {/* 막대 그래프 */}
                 <div
-                  className={`w-[14px] sm:w-[18px] rounded-full transition-all duration-700 ease-out ${colorInfo.bg} ${item.level >= 20 ? colorInfo.shadow : ''} shadow-[0_0_8px_var(--tw-shadow-color)]`}
+                  className={`w-[22px] sm:w-[28px] rounded-md transition-all duration-700 ease-out ${colorInfo.bg} ${item.level >= 20 ? colorInfo.shadow : ''} shadow-[0_0_8px_var(--tw-shadow-color)]`}
                   style={{ height: `${heightPercent}%` }}
                 />
               </div>

@@ -2,17 +2,16 @@ import { useState } from 'react';
 import type { Mission } from '../types';
 import PageHeader from '../components/layout/PageHeader';
 import MentalFlow from '../components/features/mission/MentalFlow';
-import MissionTabs from '../components/features/mission/MissionTabs';
 import MissionItem from '../components/features/mission/MissionItem';
 import Button from '../components/ui/Button';
 
 // ─── 더미 데이터 ──────────────────────────────────────────────
 const INIT_MISSIONS: Mission[] = [
-  { id: 1, icon: '🏃', title: '아침 러닝 30분', category: '운동', done: true, point: 50 },
-  { id: 2, icon: '📚', title: '독서 20페이지', category: '자기계발', done: true, point: 30 },
-  { id: 3, icon: '💧', title: '물 2L 마시기', category: '건강', done: false, point: 20 },
-  { id: 4, icon: '🧘', title: '명상 10분', category: '마음챙김', done: false, point: 25 },
-  { id: 5, icon: '✍️', title: '일기 쓰기', category: '루틴', done: false, point: 15 },
+  { id: 1, icon: '🏃', title: '아침 러닝 30분', category: '운동', done: true, point: 10 },
+  { id: 2, icon: '📚', title: '독서 20페이지', category: '자기계발', done: true, point: 10 },
+  { id: 3, icon: '💧', title: '물 2L 마시기', category: '건강', done: false, point: 5 },
+  { id: 4, icon: '🧘', title: '명상 10분', category: '마음챙김', done: false, point: 10 },
+  { id: 5, icon: '✍️', title: '일기 쓰기', category: '루틴', done: false, point: 5 },
 ];
 
 const WEEKLY_MENTAL_DATA = [
@@ -28,7 +27,6 @@ const WEEKLY_MENTAL_DATA = [
 
 const MissionPage = () => {
   const [missions, setMissions] = useState<Mission[]>(INIT_MISSIONS);
-  const [activeCategory, setActiveCategory] = useState<string>('전체');
   const [pendingMission, setPendingMission] = useState<Mission | null>(null);
 
   const handleToggle = (id: number) => {
@@ -38,11 +36,6 @@ const MissionPage = () => {
     if (!targetMission.done) {
       // 완료 처리하려고 할 때 팝업 표시
       setPendingMission(targetMission);
-    } else {
-      // 체크 해제는 바로 적용
-      setMissions((prev) =>
-        prev.map((m) => (m.id === id ? { ...m, done: false } : m))
-      );
     }
   };
 
@@ -53,11 +46,6 @@ const MissionPage = () => {
     );
     setPendingMission(null);
   };
-
-  const filtered =
-    activeCategory === '전체'
-      ? missions
-      : missions.filter((m) => m.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-surface pb-20 text-white relative">
@@ -71,15 +59,10 @@ const MissionPage = () => {
         <MentalFlow data={WEEKLY_MENTAL_DATA} />
       </section>
 
-      {/* 카테고리 탭 */}
-      <section className="px-5 mb-5">
-        <MissionTabs activeCategory={activeCategory} onChange={setActiveCategory} />
-      </section>
-
       {/* 미션 리스트 */}
       <section className="px-5">
         <div className="flex flex-col gap-2.5">
-          {filtered.map((mission) => (
+          {missions.map((mission) => (
             <MissionItem key={mission.id} mission={mission} onToggle={handleToggle} />
           ))}
         </div>
