@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import api from '../api/axios';
 
 // ─── 타입 정의 ───────────────────────────────────────────────
@@ -13,7 +14,7 @@ export interface ChatMessage {
 interface ChatSessionResponse {
   sessionId: number;
   botMessage: string;
-  analysisResponse: string | null;
+  analysisResponse: any | null;
   analysisTriggered: boolean;
 }
 
@@ -21,6 +22,8 @@ interface UseChatReturn {
   messages: ChatMessage[];
   sessionId: number | null;
   isLoading: boolean;
+  isAnalyzing: boolean; // 타워 빌딩/분석 중 로딩
+  analysisResult: any | null; // 분석 결과 상태 추가
   startChat: (userId: number | string | undefined) => Promise<void>;
   // 💡 userId를 인자로 받도록 수정했습니다.
   sendMessage: (text: string, userId: number | string | undefined) => Promise<void>;
@@ -30,9 +33,12 @@ interface UseChatReturn {
 // ─── 커스텀 훅 ───────────────────────────────────────────────
 
 export const useChat = (): UseChatReturn => {
+  const queryClient = useQueryClient();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [analysisResult, setAnalysisResult] = useState<any | null>(null);
 
   // 1. 채팅 세션 시작
   const startChat = useCallback(async (userId: number | string | undefined) => {
@@ -110,8 +116,27 @@ export const useChat = (): UseChatReturn => {
         setMessages((prev) => [...prev, aiMsg]);
       }
 
-      if (data.analysisTriggered) {
-        console.log('분석이 시작되었습니다!');
+      if (data.analysisTriggered && data.analysisResponse) {
+        console.log('분석이 시작되었습니다!', data.analysisResponse);
+        setIsAnalyzing(true);
+        
+        try {
+          // 타워 생성 API 호출
+          await api.post('/api/jenga-towers', { 
+            analysisId: data.analysisResponse.id 
+          });
+          
+          // 전역 타워 데이터 무효화 -> 자동 최신화
+          queryClient.invalidateQueries({ queryKey: ['tower', userId] });
+          // 분석 결과 도출 후 최종 결과창 진입
+          setAnalysisResult(data.analysisResponse);
+        } catch (towerError: any) {
+          console.error('타워 생성에 실패했지만 채팅은 유지됩니다:', towerError);
+          // 실패 시에도 분석 결과는 보여주거나, 별도 에러 처리
+          setAnalysisResult(data.analysisResponse);
+        } finally {
+          setIsAnalyzing(false);
+        }
       }
 
     } catch (error: any) {
@@ -125,12 +150,16 @@ export const useChat = (): UseChatReturn => {
     setMessages([]);
     setSessionId(null);
     setIsLoading(false);
+    setIsAnalyzing(false);
+    setAnalysisResult(null);
   }, []);
 
   return {
     messages,
     sessionId,
     isLoading,
+    isAnalyzing,
+    analysisResult,
     startChat,
     sendMessage,
     resetChat,

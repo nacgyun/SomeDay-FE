@@ -10,7 +10,7 @@ interface DiaryModalProps {
 
 const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
   const { user } = useAuth(); //
-  const { messages, isLoading, startChat, sendMessage, resetChat } = useChat();
+  const { messages, isLoading, isAnalyzing, analysisResult, startChat, sendMessage, resetChat } = useChat();
   const [input, setInput] = useState('');
   
   const msgEndRef = useRef<HTMLDivElement>(null);
@@ -87,8 +87,52 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
           </button>
         </div>
 
-        {/* 채팅 영역 */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3 no-scrollbar bg-[#0f0f1e]">
+        {/* 채팅 영역 또는 결과 리포트 */}
+        {analysisResult ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-50 overflow-y-auto">
+            <div className="w-20 h-20 bg-brand-orange/10 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner">
+              📈
+            </div>
+            <h2 className="text-xl font-bold text-slate-800 mb-2">분석이 완료되었습니다!</h2>
+            <p className="text-sm text-slate-500 mb-6 text-center">
+              대화를 바탕으로 오늘 하루의 타워를 세웠어요.
+            </p>
+            
+            <div className="w-full max-w-[320px] bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mt-2">
+              <div className="flex justify-between items-center mb-5 pb-5 border-b border-slate-100">
+                <span className="text-slate-600 font-bold">오늘의 안정도</span>
+                <span className="text-3xl font-black text-brand-orange-dark">
+                  {analysisResult.stabilityScore ?? 100}%
+                </span>
+              </div>
+              
+              <div className="flex flex-col gap-3">
+                <span className="text-slate-500 font-bold text-[13px] mb-1">💡 추천 미션</span>
+                {analysisResult.recommendedMissions && analysisResult.recommendedMissions.length > 0 ? (
+                  analysisResult.recommendedMissions.map((mission: any, idx: number) => (
+                    <div key={idx} className="bg-slate-50 rounded-xl px-4 py-3.5 text-slate-700 text-[14px] font-medium border border-slate-100 shadow-sm flex items-start gap-3">
+                      <span className="text-brand-orange mt-0.5">✔</span>
+                      <span className="leading-tight">{mission.title || mission}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="bg-slate-50 rounded-xl px-4 py-3.5 text-slate-700 text-[14px] font-medium border border-slate-100 shadow-sm text-center">
+                    푹 쉬면서 마음을 충전하세요! 🛋️
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <button
+              onClick={onClose}
+              className="mt-8 w-full max-w-[320px] py-4 rounded-xl font-bold text-[16px] bg-slate-800 hover:bg-slate-700 text-white shadow-lg transition-colors cursor-pointer border-none"
+            >
+              결과 닫기
+            </button>
+          </div>
+        ) : (
+        <>
+        <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3 no-scrollbar bg-[#0f0f1e] relative">
           {messages.map((msg) => (
             <div
               key={msg.id}
@@ -113,7 +157,7 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
             </div>
           ))}
 
-          {isLoading && (
+          {isLoading && !isAnalyzing && (
             <div className="flex justify-start">
               <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5">
                 🤖
@@ -132,8 +176,17 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
           <div ref={msgEndRef} />
         </div>
 
+        {/* 분석 중 오버레이 */}
+        {isAnalyzing && (
+          <div className="absolute inset-0 top-[60px] z-10 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center">
+            <div className="w-14 h-14 border-4 border-brand-orange border-t-transparent rounded-full animate-spin mb-4" />
+            <p className="text-slate-800 font-bold text-[16px]">마음을 분석하여 타워를 쌓고 있어요...</p>
+            <p className="text-slate-500 text-[13px] mt-2">잠시만 기다려주세요</p>
+          </div>
+        )}
+
         {/* 입력 창 */}
-        <div className="px-4 pb-6 pt-3 border-t border-slate-100 flex-shrink-0">
+        <div className="px-4 pb-6 pt-3 border-t border-slate-100 flex-shrink-0 relative z-20">
           <div className="flex items-center gap-2.5 bg-white border border-slate-200 shadow-inner rounded-2xl px-4 py-2.5">
             <input
               ref={inputRef}
@@ -145,15 +198,16 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
                   handleSend();
                 }
               }}
-              placeholder="마음을 자유롭게 적어보세요..."
-              className="flex-1 bg-transparent text-slate-800 text-[14px] outline-none placeholder:text-slate-400 font-sans"
+              placeholder={isAnalyzing ? "분석 중입니다..." : "마음을 자유롭게 적어보세요..."}
+              disabled={isAnalyzing}
+              className="flex-1 bg-transparent text-slate-800 text-[14px] outline-none placeholder:text-slate-400 font-sans disabled:opacity-50"
             />
             <button
               onClick={handleSend}
-              disabled={!input.trim() || isLoading}
+              disabled={!input.trim() || isLoading || isAnalyzing}
               className={[
                 'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 cursor-pointer border-none text-base',
-                input.trim() && !isLoading
+                input.trim() && !isLoading && !isAnalyzing
                   ? 'bg-gradient-to-br from-brand-orange to-brand-orange-dark text-white shadow-[0_4px_12px_rgba(255,107,0,0.3)]'
                   : 'bg-slate-100 text-slate-400',
               ].join(' ')}
@@ -162,6 +216,8 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
             </button>
           </div>
         </div>
+        </>
+        )}
       </div>
     </div>
   );
