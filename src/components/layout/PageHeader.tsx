@@ -34,7 +34,7 @@ const PageHeader = ({ title, gradientColor = 'purple', action, onBack }: PageHea
             </svg>
           </button>
         )}
-        <h2 className="text-2xl font-extrabold text-slate-800 m-0">{title}</h2>
+        <h2 className="text-3xl font-cute font-bold text-[#4a3b32] m-0">{title}</h2>
       </div>
       {action && <div>{action}</div>}
     </header>

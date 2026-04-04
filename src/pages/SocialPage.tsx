@@ -120,7 +120,7 @@ const SocialPage = () => {
 
         {/* 로딩 표시 */}
         {isLoading && (
-          <div className="w-full h-40 flex flex-col items-center justify-center p-10 pb-32">
+          <div className="w-full h-40 flex flex-col items-center justify-center p-10 pb-32 mt-20">
             <div className="w-8 h-8 border-3 border-brand-purple/20 border-t-brand-purple rounded-full animate-spin mb-4" />
             <p className="text-slate-400 text-sm font-medium italic">새로운 마음을 찾는 중...</p>
           </div>

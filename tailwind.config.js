@@ -8,6 +8,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Outfit', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        cute: ['Gaegu', 'sans-serif'],
       },
       colors: {
         brand: {

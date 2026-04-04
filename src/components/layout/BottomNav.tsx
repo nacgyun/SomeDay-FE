@@ -59,7 +59,7 @@ const BottomNav = () => {
                 {item.label}
               </span>
               {isActive && (
-                <span className="absolute bottom-[5px] w-1 h-1 rounded-full bg-[#B6754C] animate-dot-appear" />
+                <span className="absolute bottom-[0px] w-1 h-1 rounded-full bg-[#B6754C] animate-dot-appear" />
               )}
             </button>
           );

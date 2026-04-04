@@ -74,7 +74,7 @@ const MainPage = () => {
         {/* 상단 UI 오버레이 */}
         <div className="absolute top-0 left-0 right-0 z-10 p-5 pt-12 flex flex-col pointer-events-none">
           <div className="flex justify-between items-start mb-2">
-            <h2 className={`text-[21px] font-bold leading-tight mb-4 ${isStable ? 'text-brand-orange-dark/80' : 'text-slate-700'}`}>
+            <h2 className="text-3xl font-cute font-bold text-[#4a3b32] leading-tight mb-4">
               {isStable ? '생글생글 웃고있는' : '휴... 기운없는'}<br />
               {userName}님의 타워
             </h2>
@@ -131,7 +131,7 @@ const MainPage = () => {
         )}
 
         {/* 하단 일기 버튼 (타워 유무 상관없이 항상 노출되어 대화 유도) */}
-        <div className="absolute bottom-[90px] left-0 right-0 z-50 flex justify-center pointer-events-none">
+        <div className="absolute bottom-[110px] left-0 right-0 z-50 flex justify-center pointer-events-none">
           <button
             onClick={() => openModal('diary')}
             className="pointer-events-auto w-[90%] max-w-[400px] flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-[16px] border-none shadow-[0_8px_25px_rgba(0,0,0,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-[#8b5e3c] to-[#a8774d] text-white cursor-pointer"

@@ -67,8 +67,8 @@ const SocialFeedItem = ({ user, isActive, isRendered, onComfort }: SocialFeedIte
         <div className="flex items-center gap-4 mb-2">
           <img src={avatarImages[user.id % avatarImages.length]} alt="아바타" className="w-12 h-12 rounded-full object-cover ring-[3px] ring-white shadow-md ml-2" />
           <div className="flex flex-col gap-1">
-            <h2 className="text-xl font-bold text-slate-800 leading-tight">{user.nickname}님의 타워</h2>
-            <p className="text-sm text-slate-600 flex items-center">{user.comment}{user.id === 1 && <img src={cheeIcon} alt="chee" className="w-5 h-5 object-contain" />}</p>
+            <h2 className="text-xl font-cute font-bold text-[#4a3b32] leading-tight">{user.nickname}님의 타워</h2>
+            <p className="text-sm font-cute font-bold text-[#8b7b6b] flex items-center">{user.comment}{user.id === 1 && <img src={cheeIcon} alt="chee" className="w-5 h-5 object-contain" />}</p>
           </div>
         </div>
       </div>
