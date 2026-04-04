@@ -11,8 +11,9 @@ const WeekStress = ({ data }: WeekStressProps) => {
   const maxLevel = 100;
 
   const getBarColorInfo = (level: number) => {
-    if (level < 40) return { bg: 'bg-brand-red', shadow: 'shadow-brand-red/40' };
-    if (level < 75) return { bg: 'bg-brand-orange', shadow: 'shadow-brand-orange/40' };
+    // 안정도 수치(Stability Score) 기준: 높을수록 안정적(초록), 낮을수록 피료/불안(빨강)
+    if (level < 30) return { bg: 'bg-brand-red', shadow: 'shadow-brand-red/40' };
+    if (level < 60) return { bg: 'bg-brand-orange', shadow: 'shadow-brand-orange/40' };
     return { bg: 'bg-brand-green', shadow: 'shadow-brand-green/40' };
   };
 
@@ -25,7 +26,7 @@ const WeekStress = ({ data }: WeekStressProps) => {
 
       <div className="flex items-end justify-between h-[120px] gap-1 mt-2 px-1">
         {data.map((item, index) => {
-          const heightPercent = Math.max((item.level / maxLevel) * 100, 4); // 최소 높이 보장
+          const heightPercent = Math.max((item.level / maxLevel) * 100, 6); // 최소 높이 보장
           const colorInfo = getBarColorInfo(item.level);
           const isToday = index === data.length - 1;
 
@@ -40,7 +41,7 @@ const WeekStress = ({ data }: WeekStressProps) => {
 
                 {/* 막대 그래프 */}
                 <div
-                  className={`w-[22px] sm:w-[28px] rounded-md transition-all duration-700 ease-out ${colorInfo.bg} ${item.level >= 20 ? colorInfo.shadow : ''} shadow-[0_0_8px_var(--tw-shadow-color)]`}
+                  className={`w-[22px] sm:w-[28px] rounded-md transition-all duration-700 ease-out ${colorInfo.bg} ${item.level >= 10 ? colorInfo.shadow : ''} shadow-[0_0_8px_var(--tw-shadow-color)]`}
                   style={{ height: `${heightPercent}%` }}
                 />
               </div>
