@@ -58,9 +58,8 @@ const BottomNav = () => {
               >
                 {item.label}
               </span>
-              {isActive && (
-                <span className="absolute bottom-[0px] w-1 h-1 rounded-full bg-[#B6754C] animate-dot-appear" />
-              )}
+              
+              {/* 💡 제거됨: isActive && (...) 원형 점 렌더링 부분 */}
             </button>
           );
         })}
