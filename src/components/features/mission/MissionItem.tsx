@@ -51,7 +51,7 @@ const MissionItem = ({ mission, onToggle, disabled }: MissionItemProps) => {
 
       {/* 포인트 */}
       <div className="flex flex-col items-end flex-shrink-0">
-        <span className="text-base font-extrabold text-brand-green-dark">+{mission.point}</span>
+        <span className="text-base font-extrabold text-brand-green-dark">+{mission.score}</span>
         <span className="text-[11px] text-slate-400 font-medium">안정도</span>
       </div>
     </div>

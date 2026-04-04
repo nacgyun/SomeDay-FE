@@ -17,7 +17,7 @@ export interface Mission {
   title: string;
   category: string;
   done: boolean;
-  point: number;
+  score: number; // point에서 score로 변경
   dayOffset?: number; // 0 = 6 days ago, ..., 6 = today
   createdAt?: string; // 생성 시간
   completed?: boolean; // 서버 완료 여부
