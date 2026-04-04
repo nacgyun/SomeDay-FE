@@ -128,7 +128,7 @@ const DiaryModal = ({ isOpen, onClose, mode }: DiaryModalProps) => {
               
               <button
                 onClick={onClose}
-                className="mt-8 w-full max-w-[320px] py-4.5 rounded-2xl font-bold text-[16px] bg-slate-800 hover:bg-slate-700 text-white shadow-xl transition-all active:scale-95 cursor-pointer border-none"
+                className="mt-8 w-full max-w-[320px] py-4 rounded-2xl font-bold text-[16px] bg-slate-800 hover:bg-slate-700 text-white shadow-xl transition-all active:scale-95 cursor-pointer border-none"
               >
                 결과 확인하기
               </button>

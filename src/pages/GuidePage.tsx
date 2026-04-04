@@ -21,7 +21,7 @@ const GuidePage = () => {
 
   const steps = [
     {
-      title: '반가워요!\n당신의 마음 정원사 Someday입니다 ☀️',
+      title: '반가워요!\n Someday입니다 ☀️',
       description: '일상을 기록하고 마음을 쌓아 올려\n나만의 견고한 타워를 만들어 볼까요?',
       content: (
         <div className="relative w-full h-[240px] flex items-center justify-center">
@@ -115,7 +115,7 @@ const GuidePage = () => {
           
           <button
             onClick={() => navigate('/main?openDiary=true')}
-            className="w-full py-5 rounded-[28px] font-black text-lg bg-gradient-to-r from-[#8b5e3c] to-[#a8774d] text-white shadow-2xl shadow-brand-brown/30 active:scale-95 transition-all cursor-pointer border-none mb-4"
+            className="w-full py-4 rounded-[24px] font-black text-lg bg-gradient-to-r from-[#8b5e3c] to-[#a8774d] text-white shadow-2xl shadow-brand-brown/30 active:scale-95 transition-all cursor-pointer border-none mb-4"
           >
             나의 첫 타워 쌓으러 가기
           </button>
@@ -186,14 +186,14 @@ const GuidePage = () => {
               <button
                 onClick={handleBack}
                 disabled={step === 0}
-                className={`flex-1 py-4.5 rounded-[24px] font-bold text-[15px] transition-all cursor-pointer border-none bg-white text-slate-400 shadow-sm active:scale-95 ${step === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                className={`flex-1 py-4 rounded-[20px] font-bold text-[15px] transition-all cursor-pointer border-none bg-white text-slate-400 shadow-sm active:scale-95 ${step === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
               >
                 이전으로
               </button>
               
               <button
                 onClick={handleNext}
-                className="flex-[2] py-4.5 rounded-[24px] font-black text-[16px] text-white bg-[#B6754C] shadow-xl shadow-brand-brown/20 active:scale-95 transition-all cursor-pointer border-none"
+                className="flex-[2] py-4 rounded-[20px] font-black text-[16px] text-white bg-[#B6754C] shadow-xl shadow-brand-brown/20 active:scale-95 transition-all cursor-pointer border-none"
               >
                 다음으로
               </button>
