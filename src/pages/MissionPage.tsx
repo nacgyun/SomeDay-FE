@@ -21,20 +21,22 @@ const MissionPage = () => {
     queryFn: async () => {
       if (!user?.id) return [];
       const response = await api.get(`/api/recovery-missions/${user.id}/recent`);
-      console.log(response.data)
+      
       if (response.data && Array.isArray(response.data)) {
+        // 💡 로컬 시간 기준으로 오늘 날짜(YYYY-MM-DD) 추출
         const now = new Date();
-        const todayStr = now.toISOString().split('T')[0]; // "2026-04-05" 형식 추출
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const dateVal = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${dateVal}`;
 
-        // 오늘 날짜를 로컬 기준으로 정확히 잡기
-        const today = new Date(todayStr);
+        const today = new Date(year, now.getMonth(), now.getDate());
         today.setHours(0, 0, 0, 0);
 
         return response.data.map((item: any) => {
-          let dayOffset = 6;
+          let dayOffset = 6; // 기본값: 오늘
 
           if (item.missionDate) {
-            // YYYY-MM-DD 형식을 로컬 날짜로 안전하게 변환
             const mDateParts = item.missionDate.split('-');
             const missionDate = new Date(
               parseInt(mDateParts[0]),
@@ -46,13 +48,20 @@ const MissionPage = () => {
             const diffTime = today.getTime() - missionDate.getTime();
             const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
             dayOffset = 6 - diffDays;
+          } else if (item.dayIndex !== undefined) {
+            // missionDate가 없는 경우 dayIndex 활용 (일반적으로 1이 6일전, 7이 오늘인 식일 수 있음)
+            // 혹은 단순히 index를 그대로 사용 가능
+            // 여기서는 item.analysisDate가 오늘인지 체크하여 보정 가능
+            if (item.analysisDate === todayStr) {
+              dayOffset = 6;
+            }
           }
 
           return {
             ...item,
             id: item.id || Math.random(),
             dayOffset: dayOffset,
-            done: item.completed
+            done: Boolean(item.completed || item.isCompleted)
           } as Mission;
         });
       }
