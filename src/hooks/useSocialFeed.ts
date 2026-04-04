@@ -14,11 +14,13 @@ export const useSocialFeed = () => {
   const { user } = useAuth();
   const [users, setUsers] = useState<SocialUser[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const queryClient = useQueryClient();
 
   const fetchNextUser = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
+    setIsError(false);
 
     try {
       // 💡 GET /api/jenga-towers/users/random 요청
@@ -43,13 +45,17 @@ export const useSocialFeed = () => {
 
         // 3. 기존 리스트에 추가 (중복 유저는 무시하거나 허용 가능)
         setUsers((prev) => [...prev, newUser]);
+      } else {
+        // 데이터가 없는 경우도 예외 상황으로 인지할 수 있도록 처리 (옵션)
+        console.warn('더 이상 불러올 타워가 없습니다.');
       }
     } catch (error) {
       console.error('랜덤 타워 로드 실패:', error);
+      setIsError(true);
     } finally {
       setIsLoading(false);
     }
   }, [isLoading, queryClient, user?.id]);
 
-  return { users, isLoading, fetchNextUser };
+  return { users, isLoading, isError, fetchNextUser };
 };

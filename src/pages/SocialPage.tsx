@@ -8,15 +8,15 @@ import api from '../api/axios';
 
 const SocialPage = () => {
   const { user: currentUser } = useAuth();
-  const { users, isLoading, fetchNextUser } = useSocialFeed();
+  const { users, isLoading, isError, fetchNextUser } = useSocialFeed();
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
   // 초기 데이터 로드
   useEffect(() => {
-    if (users.length === 0) fetchNextUser();
-  }, [fetchNextUser, users.length]);
+    if (users.length === 0 && !isError) fetchNextUser();
+  }, [fetchNextUser, users.length, isError]);
 
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return;
@@ -27,11 +27,11 @@ const SocialPage = () => {
       setActiveIndex(index);
       
       // 💡 마지막 아이템에 도달하면 다음 랜덤 유저를 하나 더 불러옴
-      if (index === users.length - 1 && !isLoading) {
+      if (index === users.length - 1 && !isLoading && !isError) {
         fetchNextUser();
       }
     }
-  }, [activeIndex, users.length, isLoading, fetchNextUser]);
+  }, [activeIndex, users.length, isLoading, isError, fetchNextUser]);
 
   const handleComfort = async (userId: number, message: string) => {
     if (!currentUser) return;
@@ -103,6 +103,21 @@ const SocialPage = () => {
           <div className="w-full h-40 flex flex-col items-center justify-center p-10 pb-32">
             <div className="w-8 h-8 border-3 border-brand-purple/20 border-t-brand-purple rounded-full animate-spin mb-4" />
             <p className="text-slate-400 text-sm font-medium italic">새로운 마음을 찾는 중...</p>
+          </div>
+        )}
+
+        {/* 에러 표시 */}
+        {isError && (
+          <div className="w-full h-60 flex flex-col items-center justify-center p-10 pb-32">
+            <p className="text-slate-500 text-sm font-bold mb-4 text-center">
+              데이터를 불러오는 중에<br />문제가 발생했습니다.
+            </p>
+            <button
+              onClick={() => fetchNextUser()}
+              className="bg-white border border-slate-200 px-6 py-2.5 rounded-full text-slate-700 text-sm font-extrabold shadow-sm active:scale-95 transition-all"
+            >
+              다시 시도 🔄
+            </button>
           </div>
         )}
       </div>
